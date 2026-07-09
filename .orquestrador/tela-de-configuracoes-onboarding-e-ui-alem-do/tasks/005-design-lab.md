@@ -1,7 +1,7 @@
 ---
 id: 005
 title: Dock lateral do Design Lab
-status: pending
+status: done
 depends_on: [001, 002]
 covers: [AC-008, AC-009, AC-010, AC-015, AC-030, AC-032, AC-035, AC-038]
 ears_pattern: WHEN/THEN
@@ -66,4 +66,3 @@ hierarquia de ferramenta experimental, foco e feedback.
 Seguir ADR 0003. O reflow e a ausência de sobreposição em pixels serão implementados e
 inspecionados com os estilos globais na task 006 e comprovados manualmente na task 007;
 jsdom só deve provar estado, teclado, foco e semântica.
-
