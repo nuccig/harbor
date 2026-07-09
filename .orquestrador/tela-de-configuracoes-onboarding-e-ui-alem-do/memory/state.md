@@ -3,10 +3,10 @@
 - Issue: nucci-projects #29
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
-- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify
-- Current phase: post-review consolidation
-- Status: review-001 clean after re-review; post-review fixes verified and ready to commit
-- Next: commit post-review fixes, consolidate, audit, PR checks/ready
+- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify, review-001, fix loop, re-review, consolidation, brain sync, audit
+- Current phase: PR handoff
+- Status: local evidence green; PR remains draft until remote checks are available and green
+- Next: update PR body, run PR checks, report handoff to user
 - Blockers: none
 - Implementation:
   - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
@@ -25,6 +25,10 @@
     - All 4 resolved: Signal Poster restored to black/lavender with focus/canvas 12.62:1; `build.win.signAndEditExecutable=false`; report clarifies Playwright as external harness only; forced fallback confirms `canvasCount=0` and CSS fallback layer.
     - Fresh gate after source/config fixes: lint 0, typecheck 0, 148 tests passed, build 0, `build:app -- --dir --config.asar=false` 0.
     - Re-review-001 CLEAN; no `reviews-002` created.
+  - Consolidation:
+    - `memory/consolidation.md` created.
+    - Durable learnings promoted to atlas.
+    - `audit.md` created with 4 SDD process recommendations and no product blocker.
 - Risks:
   - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
   - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.97 kB. Review performance before final approval.
