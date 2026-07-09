@@ -42,8 +42,8 @@
 }
 
 .signatureIcon svg {
-  block-size: 1.2rem;
-  inline-size: 1.2rem;
+  block-size: var(--icon-md);
+  inline-size: var(--icon-md);
 }
 
 .signatureRule {
@@ -156,6 +156,21 @@
   --shadow-raised: 0 18px 54px rgb(0 0 0 / 32%);
   --font-casl: 0.46;
   --page-gutter: clamp(1rem, 2.6vw, 2.25rem);
+
+  /* Status signals — WCAG 2.1 Level AA (>=4.5:1 text contrast). */
+  /* Ratios computed with the exact WCAG relative-luminance formula. */
+
+  /* success as text: on --surface #0e1b2f → 9.71:1; on --surface-raised #152642 → 8.51:1 */
+  --success: #5ad8a6;
+
+  /* on-success as text over --success bg: #07111f on #5ad8a6 → 10.65:1 */
+  --on-success: #07111f;
+
+  /* warning as text: on --surface #0e1b2f → 11.97:1; on --surface-raised #152642 → 10.49:1 */
+  --warning: #ffd166;
+
+  /* on-warning as text over --warning bg: #0e1b2f on #ffd166 → 11.97:1 */
+  --on-warning: #0e1b2f;
 }
 
 .concept[data-concept='signal-poster'] {
