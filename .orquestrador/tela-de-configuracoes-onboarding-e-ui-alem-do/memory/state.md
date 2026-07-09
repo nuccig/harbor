@@ -4,7 +4,7 @@
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
 - Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval
-- Current phase: spec → plan handoff
+- Current phase: technical plan
 - Status: in progress
 - Next: technical plan and ADR approval
 - Blockers: none
