@@ -1,0 +1,49 @@
+# State — tela-de-configuracoes-onboarding-e-ui-alem-do
+
+- Issue: nucci-projects #29
+- Mode: full pipeline + audit
+- Branch: `codex/issue-29-configuracoes-onboarding-ui`
+- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify, review-001, fix loop, re-review, consolidation, brain sync, audit, PR body update, PR checks query
+- Current phase: handoff to user
+- Status: PR #2 is open, draft, mergeStateStatus CLEAN; GitHub reports no checks on the branch, so it was not marked ready
+- Next: user visual review and/or CI configuration decision before ready-for-review
+- Blockers: none
+- Implementation:
+  - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
+  - Task 002 PASS — fresh gate: lint 0, typecheck 0, 62 tests passed.
+  - Task 003 PASS — onboarding 10/10; integrated fresh gate green.
+  - Task 004 PASS — shell/settings 15/15; integrated fresh gate green.
+  - Task 005 PASS — Design Lab 13/13; integrated fresh gate green.
+  - Parallel wave gate: lint 0, typecheck 0, 100 tests passed.
+  - Task 006 PASS — lint 0, typecheck 0, 148 tests passed, production build 0.
+  - Task 007 PASS — 36/36 Electron matrix, 18 screenshots, manual AC-001..AC-038 PASS, lint 0, typecheck 0, 148 tests passed, production build 0, preload smoke `window.harbor.ping()=pong`.
+- Remediations during Task 007:
+  - Signal Poster contrast fixed after evidence found focus/canvas at 1.2:1; final focus/canvas 12.62:1.
+  - Preload build fixed after Electron sandbox rejected ESM syntax in `out/preload/index.mjs`; final file keeps `.mjs` name but emits CJS and the bridge responds `pong`.
+  - Review-001:
+    - 4 medium findings opened: Signal Poster palette drift, Windows unsigned build sign/edit, evidence runtime wording, NightAmbient fallback evidence.
+    - All 4 resolved: Signal Poster restored to black/lavender with focus/canvas 12.62:1; `build.win.signAndEditExecutable=false`; report clarifies Playwright as external harness only; forced fallback confirms `canvasCount=0` and CSS fallback layer.
+    - Fresh gate after source/config fixes: lint 0, typecheck 0, 148 tests passed, build 0, `build:app -- --dir --config.asar=false` 0.
+    - Re-review-001 CLEAN; no `reviews-002` created.
+  - Consolidation:
+    - `memory/consolidation.md` created.
+    - Durable learnings promoted to atlas.
+    - `audit.md` created with 4 SDD process recommendations and no product blocker.
+  - PR handoff:
+    - PR #2 body updated with real SDD checklist and evidence links.
+    - `gh pr checks 2` returned no checks reported; PR intentionally remains draft.
+- Risks:
+  - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
+  - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.97 kB. Review performance before final approval.
+- Grill decisions:
+  - Deliver three comparable design proposals.
+  - Each proposal covers the same onboarding → app shell → settings flow.
+  - Use simulated data and local UI state only; native integrations, credentials, and persistence are out of scope.
+  - Onboarding has four stages: welcome, installed agents, issue integrations, first project; nonessential setup can be skipped into a useful empty state.
+  - Settings sections: General, Appearance & motion, Agents, Integrations, Notifications.
+  - Design concepts: Command Deck, Night Harbor, Signal Poster.
+  - Each concept has one primary palette; full light/dark pairing is deferred.
+  - Design Lab is always available, preserves simulated state, switches default/loading/empty/error scenarios, records rubric scores, and selects a favorite in memory only.
+  - Common shell: Overview, Projects, Sessions, Issues, Settings; overview shows current project, active sessions, issue queue, recent consumption, and activity.
+  - Desktop target: 1024×700 minimum, optimized for 1440×900; mobile is out of scope.
+  - Prototype UI copy is English; specification and documentation are pt-BR.

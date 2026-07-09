@@ -1,0 +1,133 @@
+.flow {
+  display: grid;
+  gap: var(--space-6);
+  inline-size: min(100%, 52rem);
+  margin-inline: auto;
+  min-inline-size: 0;
+}
+
+.header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.header > * {
+  margin-block: 0;
+}
+
+.progress {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.description,
+.hint,
+.introduction {
+  color: var(--ink-muted);
+  line-height: 1.6;
+  max-inline-size: 65ch;
+}
+
+.primary {
+  min-inline-size: 0;
+}
+
+.introduction {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.introduction > * {
+  margin-block: 0;
+}
+
+.fieldset {
+  border: 0;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+.fieldset legend {
+  color: var(--ink);
+  font-size: var(--type-large);
+  font-weight: 700;
+  padding: 0;
+}
+
+.hint {
+  margin-block: 0;
+}
+
+.optionList {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.option {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr);
+  min-block-size: 44px;
+  padding: var(--space-3);
+}
+
+.option:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.option:focus-within {
+  box-shadow: 0 0 0 1px var(--canvas);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.option input {
+  accent-color: var(--accent);
+  block-size: 1.25rem;
+  inline-size: 1.25rem;
+  margin: 0;
+}
+
+.option input:focus-visible {
+  outline: none;
+}
+
+.option span {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.option small {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-block-start: var(--space-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option {
+    scroll-behavior: auto;
+  }
+}

@@ -8,13 +8,13 @@ accepted
 
 ADR 0004 fixes React + Vite for the renderer, and ADR 0003 fixes Electron for the main process. But an Electron app has three build targets — main process, preload script, renderer — with different constraints: the main and preload run in Node (CommonJS or ESM depending on the Electron version and `package.json`), the renderer runs in Chromium. Wiring Vite separately for each target (three configs, two dev servers, a manual `electron .` watcher) is doable but is pure boilerplate; every Electron+Vite project writes the same glue.
 
-`electron-vite` is a mature plugin that consolidates the three targets into one config (`electron.vite.config.ts`) and one command each for `dev` and `build`. The convention (`src/main`, `src/preload`, `src/renderer`) matches the directory layout the scaffold already uses. Electron 33+ supports `"type": "module"` in `package.json`, so the main process and preload can both be ESM — but the preload, loaded into a sandboxed context, must output `.mjs` (not `.js`, which the sandbox resolves as CommonJS under `"type": "module"`). This is a non-obvious wiring detail that, if not recorded, will be re-discovered on the next project.
+`electron-vite` is a mature plugin that consolidates the three targets into one config (`electron.vite.config.ts`) and one command each for `dev` and `build`. The convention (`src/main`, `src/preload`, `src/renderer`) matches the directory layout the scaffold already uses. Electron 33+ supports `"type": "module"` in `package.json`, so the main process can be ESM. The preload is trickier: the main process must reference the generated `../preload/index.mjs`, but Electron's sandboxed preload runner executes that file with CommonJS semantics in the current setup. Runtime smoke evidence from issue 29 showed that ESM syntax inside `index.mjs` fails with `Cannot use import statement outside a module`; the stable wiring is therefore a `.mjs` filename containing a bundled CommonJS preload.
 
 ## Decision
 
 - Use **`electron-vite`** as the single build tool for all three targets (main, preload, renderer). One config: `electron.vite.config.ts`. One command: `electron-vite dev` / `electron-vite build`.
 - Set `"type": "module"` in `package.json` (Electron 33+ supports ESM in the main process).
-- The preload outputs `.mjs`; the main process references it as `../preload/index.mjs`. Main outputs `.js` (ESM under `"type": "module"`).
+- The preload outputs `index.mjs`; the main process references it as `../preload/index.mjs`. The preload bundle itself is emitted as CommonJS (`rollupOptions.output.format = "cjs"`) so the sandbox can execute it. Main outputs `.js` (ESM under `"type": "module"`).
 - `package.json` scripts map to the canonical TASKS.md commands: `dev` = `electron-vite dev` (HMR main + renderer), `build` = `electron-vite build` (3 bundles), `app` = `electron .` (loads `out/main/index.js`, which loads `out/renderer/index.html` in prod).
 
 ## Alternatives
@@ -25,7 +25,7 @@ ADR 0004 fixes React + Vite for the renderer, and ADR 0003 fixes Electron for th
 ## Consequences
 
 - Directory layout is fixed: `src/main/`, `src/preload/`, `src/renderer/`. New features follow this split.
-- The `.mjs` preload output is a known wiring trap; any change to `"type": "module"` or the preload build config must keep the main→preload reference in sync.
+- The `.mjs` preload path plus CJS preload content is a known wiring trap; any change to `"type": "module"` or the preload build config must keep the main→preload reference and runtime smoke (`window.harbor.ping()`) in sync.
 - `electron.vite.config.ts` is the single place to add build plugins (e.g. alias paths, env injection) for any target.
 - Supersedes nothing; complements ADR 0004 (which names Vite for the renderer but not the main/preload build).
 

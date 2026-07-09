@@ -1,0 +1,186 @@
+.shell {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(12rem, 0.24fr) minmax(0, 1fr);
+  min-block-size: 100%;
+  min-inline-size: 0;
+}
+
+.sidebar {
+  align-content: start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+  padding: var(--space-5);
+}
+
+.productHeader,
+.contentHeader {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.productHeader > strong {
+  font-size: var(--type-title);
+}
+
+.eyebrow {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.primaryNavigation {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.destinationButton {
+  inline-size: 100%;
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.destinationButton[aria-current='page'] {
+  background: var(--surface-active);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.sessionNote {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+  margin: 0;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+}
+
+.contentHeader > h1 {
+  margin: 0;
+}
+
+.overview {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-inline-size: 0;
+}
+
+.group,
+.destinationPanel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  padding: var(--space-5);
+}
+
+.group[data-surface-slot='primary'],
+.group[data-surface-slot='activity'] {
+  grid-column: 1 / -1;
+}
+
+.groupHeader {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+}
+
+.groupHeader h2,
+.destinationPanel h2,
+.destinationPanel p {
+  margin: 0;
+}
+
+.projectSummary,
+.dataList {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.projectSummary > div,
+.dataList > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.projectSummary dt,
+.dataList dt {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+}
+
+.projectSummary dd,
+.dataList dd {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.itemList,
+.activityList {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.itemList > li,
+.activityList > li {
+  align-items: center;
+  border-block-end: 1px solid var(--border);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-block-size: 44px;
+  padding-block: var(--space-2);
+}
+
+.itemList > li:last-child,
+.activityList > li:last-child {
+  border-block-end: 0;
+}
+
+.itemList > li > span:first-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.itemList > li > span:last-child,
+.activityList time {
+  color: var(--ink-muted);
+  flex: none;
+  font-size: var(--type-small);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 70rem) {
+  .shell {
+    grid-template-columns: minmax(10rem, 0.22fr) minmax(0, 1fr);
+  }
+
+  .overview {
+    grid-template-columns: 1fr;
+  }
+
+  .group[data-surface-slot] {
+    grid-column: auto;
+  }
+}
