@@ -3,10 +3,10 @@
 - Issue: nucci-projects #29
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
-- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify, review-001, fix loop, re-review, consolidation, brain sync, audit
-- Current phase: PR handoff
-- Status: local evidence green; PR remains draft until remote checks are available and green
-- Next: update PR body, run PR checks, report handoff to user
+- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify, review-001, fix loop, re-review, consolidation, brain sync, audit, PR body update, PR checks query
+- Current phase: handoff to user
+- Status: PR #2 is open, draft, mergeStateStatus CLEAN; GitHub reports no checks on the branch, so it was not marked ready
+- Next: user visual review and/or CI configuration decision before ready-for-review
 - Blockers: none
 - Implementation:
   - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
@@ -29,6 +29,9 @@
     - `memory/consolidation.md` created.
     - Durable learnings promoted to atlas.
     - `audit.md` created with 4 SDD process recommendations and no product blocker.
+  - PR handoff:
+    - PR #2 body updated with real SDD checklist and evidence links.
+    - `gh pr checks 2` returned no checks reported; PR intentionally remains draft.
 - Risks:
   - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
   - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.97 kB. Review performance before final approval.
