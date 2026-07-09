@@ -1,7 +1,7 @@
 ---
 id: 004
 title: Shell operacional e configurações compartilhadas
-status: pending
+status: done
 depends_on: [001, 002]
 covers: [AC-005, AC-006, AC-007, AC-011, AC-029, AC-030, AC-036]
 ears_pattern: WHEN/THEN
@@ -68,4 +68,3 @@ Onboarding (task 003), shell/settings (esta task) e Design Lab (task 005) podem 
 implementados em paralelo após 001/002 porque seus scopes são disjuntos. Não importar
 ícones específicos de conceito: slots e ações comuns serão decorados pelos presenters
 na integração.
-
