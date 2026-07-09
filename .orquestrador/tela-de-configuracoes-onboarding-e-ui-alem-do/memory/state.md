@@ -4,7 +4,7 @@
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
 - Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis
-- Current phase: implement task 006
+- Current phase: task 007 manual evidence and final verify
 - Status: in progress
 - Next: implementation waves 001 → 002 → (003 || 004 || 005) → 006 → 007
 - Blockers: none
@@ -15,8 +15,10 @@
   - Task 004 PASS — shell/settings 15/15; integrated fresh gate green.
   - Task 005 PASS — Design Lab 13/13; integrated fresh gate green.
   - Parallel wave gate: lint 0, typecheck 0, 100 tests passed.
+  - Task 006 PASS — lint 0, typecheck 0, 148 tests passed, production build 0.
 - Risks:
   - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
+  - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.94 kB. Review performance before final approval.
 - Grill decisions:
   - Deliver three comparable design proposals.
   - Each proposal covers the same onboarding → app shell → settings flow.

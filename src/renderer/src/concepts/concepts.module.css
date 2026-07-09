@@ -1,0 +1,376 @@
+.concept {
+  background: var(--canvas);
+  color: var(--ink);
+  display: flex;
+  inline-size: 100%;
+  min-block-size: 100dvh;
+  min-inline-size: 0;
+  overflow: clip;
+  position: relative;
+}
+
+.productFrame {
+  container-type: inline-size;
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-inline-size: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.signature {
+  align-items: center;
+  border-block-end: 1px solid var(--border);
+  color: var(--ink-muted);
+  display: grid;
+  font-size: var(--type-small);
+  font-variation-settings: 'MONO' 1, 'CASL' var(--font-casl);
+  font-weight: 650;
+  gap: var(--space-3);
+  grid-template-columns: auto auto minmax(2rem, 1fr);
+  letter-spacing: 0.08em;
+  min-block-size: 44px;
+  padding-inline: var(--page-gutter);
+  text-transform: uppercase;
+}
+
+.signatureIcon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.signatureIcon svg {
+  block-size: 1.2rem;
+  inline-size: 1.2rem;
+}
+
+.signatureRule {
+  background: var(--border);
+  block-size: 1px;
+}
+
+.product {
+  inline-size: 100%;
+  min-inline-size: 0;
+  overflow: auto;
+  padding: var(--page-gutter);
+  position: relative;
+}
+
+.labSlot {
+  display: flex;
+  flex: 0 0 auto;
+  min-inline-size: 0;
+  position: relative;
+  z-index: 3;
+}
+
+.ambientSlot,
+.nightAmbient,
+.ambientFallback,
+.ambientCanvas {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.ambientSlot {
+  overflow: hidden;
+  z-index: 0;
+}
+
+.nightAmbient {
+  opacity: 0.58;
+}
+
+.ambientFallback {
+  background:
+    radial-gradient(circle at 18% 26%, rgb(99 169 255 / 22%), transparent 28rem),
+    radial-gradient(circle at 82% 68%, rgb(182 156 255 / 18%), transparent 32rem);
+}
+
+[data-ambient-fallback='static'] {
+  background:
+    radial-gradient(circle at 18% 26%, rgb(99 169 255 / 22%), transparent 28rem),
+    radial-gradient(circle at 82% 68%, rgb(182 156 255 / 18%), transparent 32rem);
+  inset: 0;
+  position: absolute;
+}
+
+.ambientCanvas {
+  block-size: 100%;
+  inline-size: 100%;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
+.concept[data-concept='command-deck'] {
+  color-scheme: light;
+  font-variation-settings: 'CASL' 0.12;
+
+  --canvas: #f2f4f7;
+  --surface: #ffffff;
+  --surface-raised: #f8fafc;
+  --surface-active: #dceee9;
+  --ink: #111827;
+  --ink-muted: #4b5563;
+  --accent: #0b6b5b;
+  --on-accent: #ffffff;
+  --danger: #a21c2d;
+  --on-danger: #ffffff;
+  --border: #9aa5b1;
+  --focus-ring: #005fcc;
+  --selection: #c7e8df;
+  --selection-ink: #111827;
+  --radius-small: 2px;
+  --radius-control: 4px;
+  --radius-panel: 6px;
+  --shadow-raised: 0 8px 24px rgb(17 24 39 / 12%);
+  --font-casl: 0.12;
+  --page-gutter: clamp(1rem, 2.4vw, 2rem);
+}
+
+.concept[data-concept='night-harbor'] {
+  color-scheme: dark;
+  font-variation-settings: 'CASL' 0.46;
+
+  --canvas: #07111f;
+  --surface: #0e1b2f;
+  --surface-raised: #152642;
+  --surface-active: #19385a;
+  --ink: #f3f7ff;
+  --ink-muted: #aabbd1;
+  --accent: #63a9ff;
+  --on-accent: #07111f;
+  --danger: #ff8d9d;
+  --on-danger: #21040a;
+  --border: #41597a;
+  --focus-ring: #ffd166;
+  --selection: #385f9c;
+  --selection-ink: #ffffff;
+  --radius-small: 8px;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --shadow-raised: 0 18px 54px rgb(0 0 0 / 32%);
+  --font-casl: 0.46;
+  --page-gutter: clamp(1rem, 2.6vw, 2.25rem);
+}
+
+.concept[data-concept='signal-poster'] {
+  color-scheme: dark;
+  font-variation-settings: 'CASL' 0.92;
+
+  --canvas: #d9ccff;
+  --surface: #111111;
+  --surface-raised: #241c36;
+  --surface-active: #3b2a5d;
+  --ink: #f6f1ff;
+  --ink-muted: #cfc4eb;
+  --accent: #bfa8ff;
+  --on-accent: #111111;
+  --danger: #ff8da1;
+  --on-danger: #111111;
+  --border: #8f7bb9;
+  --focus-ring: #ffe75a;
+  --selection: #111111;
+  --selection-ink: #f6f1ff;
+  --radius-small: 0;
+  --radius-control: 0;
+  --radius-panel: 0;
+  --shadow-raised: none;
+  --font-casl: 0.92;
+  --page-gutter: clamp(1rem, 2.8vw, 2.5rem);
+}
+
+.concept[data-concept='command-deck'] .signature {
+  background: var(--surface);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.concept[data-concept='night-harbor'] .signature {
+  backdrop-filter: blur(14px);
+  background: rgb(7 17 31 / 78%);
+}
+
+.concept[data-concept='signal-poster'] .signature {
+  background: var(--canvas);
+  border-block-end: 4px solid #111111;
+  color: #111111;
+  font-weight: 850;
+}
+
+.concept[data-concept='signal-poster'] .signatureRule {
+  background: #111111;
+  block-size: 4px;
+}
+
+.concept[data-concept='signal-poster'] .productFrame {
+  border-inline: 4px solid #111111;
+}
+
+.concept[data-concept='signal-poster'] :global(h1) {
+  font-size: clamp(2.65rem, 6vw, 6.5rem);
+  font-variation-settings: 'CASL' 1;
+  font-weight: 900;
+  letter-spacing: -0.065em;
+  line-height: 0.82;
+  max-inline-size: 12ch;
+  text-transform: uppercase;
+}
+
+.concept[data-concept='command-deck'] :global([data-surface='overview']) {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.concept[data-concept='command-deck']
+  :global([data-surface-slot='primary']),
+.concept[data-concept='command-deck']
+  :global([data-surface-slot='queue']) {
+  grid-column: span 7;
+}
+
+.concept[data-concept='command-deck']
+  :global([data-surface-slot='metrics']),
+.concept[data-concept='command-deck']
+  :global([data-surface-slot='utility']) {
+  grid-column: span 5;
+}
+
+.concept[data-concept='command-deck']
+  :global([data-surface-slot='activity']) {
+  grid-column: 1 / -1;
+}
+
+.concept[data-concept='night-harbor'] :global([data-surface='overview']) {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.concept[data-concept='night-harbor']
+  :global([data-surface-slot='primary']) {
+  grid-column: span 8;
+}
+
+.concept[data-concept='night-harbor']
+  :global([data-surface-slot='metrics']) {
+  grid-column: span 4;
+}
+
+.concept[data-concept='night-harbor']
+  :global([data-surface-slot='queue']),
+.concept[data-concept='night-harbor']
+  :global([data-surface-slot='utility']),
+.concept[data-concept='night-harbor']
+  :global([data-surface-slot='activity']) {
+  grid-column: span 4;
+}
+
+.concept[data-concept='signal-poster'] :global([data-surface='overview']) {
+  gap: 0;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot='primary']) {
+  grid-column: span 8;
+}
+
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot='metrics']) {
+  grid-column: span 4;
+}
+
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot='queue']),
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot='activity']) {
+  grid-column: span 6;
+}
+
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot='utility']) {
+  grid-column: 1 / -1;
+}
+
+.concept[data-concept='signal-poster']
+  :global([data-surface-slot]),
+.concept[data-concept='signal-poster']
+  :global([data-surface='settings']) {
+  border-width: 2px;
+  box-shadow: none;
+}
+
+@container (max-width: 58rem) {
+  .concept :global([data-surface='overview']) {
+    grid-template-columns: 1fr;
+  }
+
+  .concept :global([data-surface-slot]) {
+    grid-column: auto !important;
+  }
+
+  .concept :global([data-surface='settings']) {
+    grid-template-columns: 1fr;
+  }
+
+  .concept :global(nav[aria-label='Settings categories']) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 70rem), (max-height: 47rem) {
+  .signature {
+    padding-inline: var(--space-4);
+  }
+
+  .product {
+    padding: var(--space-4);
+  }
+
+  .concept[data-concept='signal-poster'] :global(h1) {
+    font-size: clamp(2.25rem, 5vw, 4rem);
+  }
+}
+
+/* Evaluation baseline: 1024 × 700. Keep the dock in-flow and the product single-column. */
+@media (max-width: 64rem) and (max-height: 43.75rem) {
+  .concept {
+    max-inline-size: 100vw;
+  }
+
+  .product {
+    overflow-x: hidden;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .concept :global([data-surface='overview']),
+  .concept :global([data-surface='settings']) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .concept :global([data-surface-slot]) {
+    grid-column: auto !important;
+  }
+
+  .concept :global(nav[aria-label='Settings categories']) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Evaluation expansion: 1440 × 900. Preserve all five Overview groups in the first scan. */
+@media (min-width: 90rem) and (min-height: 56.25rem) {
+  .product {
+    padding: var(--space-6);
+  }
+
+  .concept :global([data-surface='overview']) {
+    align-content: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambientCanvas {
+    display: none;
+  }
+}

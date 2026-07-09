@@ -1,0 +1,98 @@
+@font-face {
+  font-display: swap;
+  font-family: 'Recursive Harbor';
+  font-style: normal;
+  font-weight: 300 1000;
+  src: url('../assets/fonts/RecursiveVariable.woff2') format('woff2-variations');
+}
+
+:root {
+  color-scheme: light;
+  font-family:
+    'Recursive Harbor', 'Segoe UI', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --type-small: 0.78rem;
+  --type-body: 0.95rem;
+  --type-large: 1.125rem;
+  --type-title: clamp(2rem, 4vw, 4.5rem);
+  --duration-fast: 160ms;
+  --duration-loading: 760ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --layer-skip-link: 40;
+  --layer-toast: 60;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--canvas, #f2f4f7);
+  min-block-size: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--canvas, #f2f4f7);
+  color: var(--ink, #111827);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  margin: 0;
+  min-block-size: 100%;
+  min-inline-size: 0;
+  overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+label,
+select {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex='-1']:focus-visible {
+  outline-color: var(--focus-ring);
+}
+
+#root {
+  min-block-size: 100dvh;
+  min-inline-size: 0;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--selection-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

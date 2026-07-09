@@ -1,7 +1,7 @@
 ---
 id: 006
 title: Conceitos visuais, integração da raiz e matriz de estados
-status: pending
+status: done
 depends_on: [003, 004, 005]
 covers: [AC-008, AC-009, AC-012, AC-013, AC-017, AC-019, AC-020, AC-021, AC-022, AC-023, AC-024, AC-025, AC-026, AC-027, AC-028, AC-029, AC-030, AC-031, AC-032, AC-033, AC-034, AC-035, AC-037]
 ears_pattern: WHERE/WHEN/THEN
@@ -96,4 +96,3 @@ Serial Lock: esta integração importa arquivos ainda inexistentes das tasks 003
 pode iniciar após todas pousarem. Seguir ADR 0002/0004 e a seção **Presentation system**.
 Não editar package/config/assets (owner 001), nem qualquer arquivo main/preload/IPC.
 Vitest não prova layout, contraste, GPU, hit targets ou qualidade de motion.
-
