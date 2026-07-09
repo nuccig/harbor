@@ -3,10 +3,10 @@
 - Issue: nucci-projects #29
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
-- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis
-- Current phase: task 007 manual evidence and final verify
-- Status: in progress
-- Next: implementation waves 001 → 002 → (003 || 004 || 005) → 006 → 007
+- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify
+- Current phase: post-implementation review/consolidation
+- Status: task implementation complete
+- Next: review/fix loop, consolidate, audit, PR checks/ready
 - Blockers: none
 - Implementation:
   - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
@@ -16,6 +16,10 @@
   - Task 005 PASS — Design Lab 13/13; integrated fresh gate green.
   - Parallel wave gate: lint 0, typecheck 0, 100 tests passed.
   - Task 006 PASS — lint 0, typecheck 0, 148 tests passed, production build 0.
+  - Task 007 PASS — 36/36 Electron matrix, 18 screenshots, manual AC-001..AC-038 PASS, lint 0, typecheck 0, 148 tests passed, production build 0, preload smoke `window.harbor.ping()=pong`.
+- Remediations during Task 007:
+  - Signal Poster contrast fixed after evidence found focus/canvas at 1.2:1; final focus/canvas 13.05:1.
+  - Preload build fixed after Electron sandbox rejected ESM syntax in `out/preload/index.mjs`; final file keeps `.mjs` name but emits CJS and the bridge responds `pong`.
 - Risks:
   - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
   - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.94 kB. Review performance before final approval.

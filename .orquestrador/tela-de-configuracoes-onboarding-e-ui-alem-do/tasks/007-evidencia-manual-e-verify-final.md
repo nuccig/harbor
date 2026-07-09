@@ -1,7 +1,7 @@
 ---
 id: 007
 title: Evidência manual rastreável e verify final
-status: pending
+status: done
 depends_on: [006]
 covers: [AC-001, AC-002, AC-003, AC-004, AC-005, AC-006, AC-007, AC-008, AC-009, AC-010, AC-011, AC-012, AC-013, AC-014, AC-015, AC-016, AC-017, AC-018, AC-019, AC-020, AC-021, AC-022, AC-023, AC-024, AC-025, AC-026, AC-027, AC-028, AC-029, AC-030, AC-031, AC-032, AC-033, AC-034, AC-035, AC-036, AC-037, AC-038]
 ears_pattern: AFTER/THEN
@@ -83,4 +83,3 @@ marcá-los como aprovados. Use o roteiro de `plan.md`, **Manual verification**, 
 da spec. Screenshots devem usar nomes estáveis contendo AC, conceito, superfície,
 cenário e viewport. Não editar source para “ajustar durante a inspeção”; isso violaria
 file ownership e exige uma rodada de correção própria.
-

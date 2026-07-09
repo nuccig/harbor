@@ -162,20 +162,20 @@
   color-scheme: dark;
   font-variation-settings: 'CASL' 0.92;
 
-  --canvas: #d9ccff;
+  --canvas: #28124f;
   --surface: #111111;
-  --surface-raised: #241c36;
-  --surface-active: #3b2a5d;
-  --ink: #f6f1ff;
-  --ink-muted: #cfc4eb;
-  --accent: #bfa8ff;
+  --surface-raised: #1f1238;
+  --surface-active: #3f2673;
+  --ink: #fff7ff;
+  --ink-muted: #dfd1ff;
+  --accent: #ffe75a;
   --on-accent: #111111;
   --danger: #ff8da1;
   --on-danger: #111111;
-  --border: #8f7bb9;
+  --border: #ffe75a;
   --focus-ring: #ffe75a;
-  --selection: #111111;
-  --selection-ink: #f6f1ff;
+  --selection: #ffe75a;
+  --selection-ink: #111111;
   --radius-small: 0;
   --radius-control: 0;
   --radius-panel: 0;
@@ -196,18 +196,18 @@
 
 .concept[data-concept='signal-poster'] .signature {
   background: var(--canvas);
-  border-block-end: 4px solid #111111;
-  color: #111111;
+  border-block-end: 4px solid var(--border);
+  color: var(--ink);
   font-weight: 850;
 }
 
 .concept[data-concept='signal-poster'] .signatureRule {
-  background: #111111;
+  background: var(--border);
   block-size: 4px;
 }
 
 .concept[data-concept='signal-poster'] .productFrame {
-  border-inline: 4px solid #111111;
+  border-inline: 4px solid var(--border);
 }
 
 .concept[data-concept='signal-poster'] :global(h1) {
