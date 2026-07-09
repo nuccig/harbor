@@ -20,8 +20,8 @@ API privilegiada.
 O plano adota reducer + Context do React, layouts finos por slots, CSS custom properties,
 CSS Modules e primitives acessíveis sem estilo. Motion permanece híbrido: CSS resolve
 estados simples; `motion/react` resolve continuidade/layout; `shaders/react` fornece
-somente o ambiente lazy e degradável de Night Harbor. As decisões técnicas foram
-resolvidas; o documento permanece draft até a aprovação final do plano.
+somente o ambiente lazy e degradável de Night Harbor. As decisões técnicas e o plano
+foram aprovados no gate HITL final.
 
 ## Arquitetura
 

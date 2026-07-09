@@ -60,8 +60,8 @@ Não carregar `harbor-electron-build`: `electron.vite.config.ts` não pertence a
 
 ## Acceptance check
 
-- [ ] `npm install` resolve somente os nove pacotes aprovados e `package-lock.json`
-      registra a mesma resolução.
+- [ ] `npm install` adiciona as nove dependências diretas aprovadas; dependências
+      transitivas entram apenas via resolução registrada em `package-lock.json`.
 - [ ] `tests/smoke.test.ts` continua incluído em Node e não foi movido nem editado.
 - [ ] Selecionar cada um de `command-deck`, `night-harbor` e `signal-poster` preserva,
       separadamente, passo, destino, categoria, cenário, drafts e dados (AC-008/014).
@@ -82,4 +82,3 @@ Seguir `plan.md` em **Data & contracts** e ADRs 0001, 0004 e 0005. Os ids intern
 literais fechados e não sofrem transformação externa. A configuração seletiva pode usar
 file directives ou projects do Vitest, mas não pode transformar o ambiente global em
 jsdom. Esta task é a owner única de package/config/lockfile e dos assets/licenças.
-
