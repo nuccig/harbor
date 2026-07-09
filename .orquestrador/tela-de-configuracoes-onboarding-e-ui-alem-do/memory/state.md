@@ -4,9 +4,19 @@
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
 - Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall
-- Current phase: grill-me
+- Current phase: spec
 - Status: in progress
 - Next: grill-me, spec
 - Blockers: none
 - Grill decisions:
   - Deliver three comparable design proposals.
+  - Each proposal covers the same onboarding → app shell → settings flow.
+  - Use simulated data and local UI state only; native integrations, credentials, and persistence are out of scope.
+  - Onboarding has four stages: welcome, installed agents, issue integrations, first project; nonessential setup can be skipped into a useful empty state.
+  - Settings sections: General, Appearance & motion, Agents, Integrations, Notifications.
+  - Design concepts: Command Deck, Night Harbor, Signal Poster.
+  - Each concept has one primary palette; full light/dark pairing is deferred.
+  - Design Lab is always available, preserves simulated state, switches default/loading/empty/error scenarios, records rubric scores, and selects a favorite in memory only.
+  - Common shell: Overview, Projects, Sessions, Issues, Settings; overview shows current project, active sessions, issue queue, recent consumption, and activity.
+  - Desktop target: 1024×700 minimum, optimized for 1440×900; mobile is out of scope.
+  - Prototype UI copy is English; specification and documentation are pt-BR.
