@@ -1,7 +1,7 @@
 ---
 id: 003
 title: Fluxo de onboarding compartilhado
-status: pending
+status: done
 depends_on: [001, 002]
 covers: [AC-001, AC-002, AC-003, AC-004, AC-014, AC-029, AC-030, AC-036]
 ears_pattern: WHEN/THEN
@@ -66,4 +66,3 @@ Não criar estado local que replique o reducer. A conclusão dispara a ação co
 a montagem efetiva de Overview será integrada na task 006. Os componentes devem expor
 slots semânticos para os layouts, sem importar qualquer concept presenter ou família de
 ícones diretamente.
-
