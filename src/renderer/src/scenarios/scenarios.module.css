@@ -1,0 +1,33 @@
+.presenter {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.ready {
+  min-inline-size: 0;
+}
+
+.loading {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.skeletons {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.loadingActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.safeActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

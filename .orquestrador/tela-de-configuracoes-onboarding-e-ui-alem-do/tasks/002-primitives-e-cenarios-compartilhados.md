@@ -1,7 +1,7 @@
 ---
 id: 002
 title: Primitives acessíveis e presenters de cenário compartilhados
-status: pending
+status: done
 depends_on: [001]
 covers: [AC-011, AC-018, AC-032]
 ears_pattern: WHEN/THEN
@@ -66,4 +66,3 @@ Consumir tipos e catálogo de `src/renderer/src/app/`; não duplicar fixtures ne
 Os CSS Modules desta task só podem consumir tokens semânticos, mesmo que os valores
 globais sejam integrados mais tarde pela task 006. jsdom comprova comportamento e
 semântica estrutural, não tamanho real, contraste ou foco visual.
-
