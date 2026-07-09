@@ -1,0 +1,9 @@
+node_modules/
+out/
+dist/
+harbor.db
+harbor.db-wal
+harbor.db-shm
+*.log
+.smoke-selfcheck.cjs
+.DS_Store
