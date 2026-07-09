@@ -4,10 +4,14 @@
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
 - Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis
-- Current phase: implement task 001
+- Current phase: implement task 002
 - Status: in progress
 - Next: implementation waves 001 → 002 → (003 || 004 || 005) → 006 → 007
 - Blockers: none
+- Implementation:
+  - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
+- Risks:
+  - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
 - Grill decisions:
   - Deliver three comparable design proposals.
   - Each proposal covers the same onboarding → app shell → settings flow.

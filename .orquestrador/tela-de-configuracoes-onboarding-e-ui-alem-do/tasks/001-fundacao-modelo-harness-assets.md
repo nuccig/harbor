@@ -1,7 +1,7 @@
 ---
 id: 001
 title: Fundação de dependências, modelo efêmero, harness e assets
-status: pending
+status: done
 depends_on: []
 covers: [AC-008, AC-009, AC-010, AC-014, AC-015, AC-016, AC-038]
 ears_pattern: GIVEN/WHEN/THEN
