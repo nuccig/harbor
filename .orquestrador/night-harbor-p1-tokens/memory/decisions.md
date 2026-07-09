@@ -181,4 +181,110 @@ Sem mudança visual em P1 (nenhum elemento usa `.data` ainda).
 
 ---
 
+## D-010: Semântica `on-*` — Cor de Texto sobre Token como Fundo (FIX-1)
+
+**Decisão**: `--on-success` e `--on-warning` são cores de **texto/overlay sobre o token como fundo**, não o inverso.
+
+**Contexto**: Implement-agent assumiu `on-*` significava "fundo para o token"; resultou em `--on-success: #f3f7ff` (claro) sobre `--success: #5ad8a6` (verde) = 1.66:1 (falha WCAG).
+
+**Implementação**:
+```css
+/* Correto */
+--success: #5ad8a6;           /* cor de background/sinal */
+--on-success: #07111f;        /* cor de texto/ícone sobre --success; 10.65:1 contra #5ad8a6 */
+
+--warning: #ffd166;           /* cor de background/sinal */
+--on-warning: #0e1b2f;        /* cor de texto/ícone sobre --warning; 12.4:1 contra #ffd166 */
+```
+
+**Padrão estabelecido**: Alinha com `--on-accent` (já escuro em night-harbor) e `--on-danger`.
+
+**Verificação**: Todos os `on-*` tokens agora têm contraste ≥10:1 (AAA+).
+
+---
+
+## D-011: Tiers de Motion — Fast e Base são Semântica Distinta (FIX-2)
+
+**Decisão**: `--duration-fast` permanece 160ms como tier semântico "ação rápida"; `--motion-duration: 280ms` é base "transição natural". Não colapsar via alias.
+
+**Contexto**: Implementação inicial mapeou `--duration-fast: var(--motion-duration)` (280ms), mudando silenciosamente o comportamento legado de 160ms → 280ms. Hovers ficaram mais lentos; comportamento inesperado.
+
+**Implementação**:
+```css
+:root {
+  /* Motion base (novo) */
+  --motion-duration: 280ms;
+  --motion-duration-exit: 182ms;
+  
+  /* Fast tier (legado, preservado) */
+  --motion-duration-fast: 160ms;        /* Novo; antes era alias a 160ms via --duration-fast */
+  --duration-fast: var(--motion-duration-fast);  /* Alias legado para backward compat */
+  
+  /* Aliases legais (não deletadas) */
+  --ease-standard: var(--motion-ease);   /* Novo token */
+}
+```
+
+**Armadilha evitada**: Componentes legais (command-deck, signal-poster) que leem `--duration-fast: 160ms` para hovers/toggles agora comportam-se como antes.
+
+**Lição**: Alias de **token rename** (ex., `--ease-old` → `--ease-new`) são seguros. Alias de **tier unification** quebram semântica. Fast e base são papéis, não sinônimos.
+
+---
+
+## D-012: Motion Overrides em motion/react Bypassam reducedMotion Central (FIX-3)
+
+**Decisão**: Overrides de `exit`/`enter` transition em motion/react não herdam automaticamente `MotionConfig reducedMotion='user'`. Usar ternário explícito em cada override que toca motion.
+
+**Contexto**: `ConceptScaffold.tsx` exit transition (182ms + easing) era static, bypassava reduceMotion. Sistema honra `prefers-reduced-motion: reduce` (0.08s quando ativo), mas exit override ignorava isto.
+
+**Implementação**:
+```typescript
+// ConceptScaffold.tsx
+const reduceMotion = useReducedMotion();
+
+const activeTransition = reduceMotion 
+  ? { duration: 0.08 }  // Fast exit para acessibilidade
+  : transition;          // Normal (0.28s ou custom)
+
+const exitTransition = reduceMotion
+  ? { duration: 0.08 }
+  : { duration: motionTokens.durationExit, ease: motionTokens.ease };
+
+// Apply
+<motion.main
+  exit={{ opacity: 0, x: -offset, y: ..., transition: exitTransition }}
+  ...
+/>
+```
+
+**Padrão establecido**: Qualquer `transition` override (exit, enter, initial, whileHover, whileTap) que usa `motionTokens` deve ter ternário `reduceMotion ? fast : motionTokens.*`.
+
+**Verificação**: Testes passam sob `matchMedia('prefers-reduced-motion: reduce')`.
+
+---
+
+## D-013: WCAG Contraste — Método Exato (Gamma 2.2) vs Aproximado (Expoente 2.2)
+
+**Decisão**: Usar fórmula WCAG 2.1 exata (gamma curve do sRGB, γ=2.2) para auditoria de novos tokens. Documentar resultado numérico no comentário CSS.
+
+**Contexto**: Spec pressupunha aproximação exponente 2.2; controller auditou com fórmula exata. Divergência ≤20% (ex., 9.7 vs 11.97 em verde), mas ambas PASSAM AA/AAA.
+
+**Implementação**:
+```css
+/* #5ad8a6 on #0e1b2f → WCAG 2.1 exact ratio 9.7:1 ✓ AA & AAA */
+--success: #5ad8a6;
+--on-success: #07111f;
+
+/* #ffd166 on #0e1b2f → WCAG 2.1 exact ratio 12.4:1 ✓ AA & AAA */
+--warning: #ffd166;
+--on-warning: #0e1b2f;
+```
+
+**Verificação**: Ratio exato = (L1 + 0.05) / (L2 + 0.05) onde L = luminância sRGB-linear.
+
+**Lição**: Para P2+, usar checker WCAG automático em pre-commit; evita divergência manual.
+
+---
+
 **Última atualização**: 2026-07-09
+

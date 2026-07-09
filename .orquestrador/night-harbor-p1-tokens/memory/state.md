@@ -2,43 +2,43 @@
 
 ## Status Atual
 
-**Fase**: `implement`  
+**Fase**: `consolidate`  
 **Data**: 2026-07-09  
-**Entrada**: spec.md aprovada pelo usuário (P1 completo, 12 ACs)  
-**Atividade**: Aguardando implement-agent
+**Entrada**: implement completa (12 ACs verdes, gate 151/151)  
+**Atividade**: Handoff para consolidate-agent (review, lessons, skill update)
 
 ---
 
 ## Checklist de Implementação
 
 ### Motion (AC-001-004)
-- [ ] `global.css` `:root` → inserir `--motion-duration: 280ms`, `--motion-duration-exit: 182ms`, `--motion-ease: cubic-bezier(0.22, 1, 0.36, 1)`
-- [ ] `motion-tokens.ts` (novo) → exportar `motionTokens` com `duration: 0.28`, `durationExit: 0.182`, `ease: [0.22,1,0.36,1]`
-- [ ] `ConceptScaffold.tsx` → importar `motionTokens`, aplicar em exit transition (override duration)
-- [ ] `NightHarborLayout.tsx` → remover hardcoding, usar `motionTokens`
-- [ ] `app-integration.test.tsx` ou novo `concept-transitions.test.tsx` → assert AC-012 (exit < enter)
+- [x] `global.css` `:root` → inserir `--motion-duration: 280ms`, `--motion-duration-exit: 182ms`, `--motion-ease: cubic-bezier(0.22, 1, 0.36, 1)` ✅ (dabbe50)
+- [x] `motion-tokens.ts` (novo) → exportar `motionTokens` com `duration: 0.28`, `durationExit: 0.182`, `ease: [0.22,1,0.36,1]` ✅ (dabbe50)
+- [x] `ConceptScaffold.tsx` → importar `motionTokens`, aplicar em exit transition (override duration) ✅ (dabbe50, FIX-3)
+- [x] `NightHarborLayout.tsx` → remover hardcoding, usar `motionTokens` ✅ (dabbe50)
+- [x] novo `motion-tokens.test.ts` → assert AC-012 (exit < enter) ✅ (dabbe50, 3 asserts)
 
 ### Status (AC-005-006)
-- [ ] `concepts.module.css` `[data-concept='night-harbor']` → inserir `--success`, `--on-success`, `--warning`, `--on-warning`
-- [ ] Comentários CSS documentando WCAG ratios (9.7:1 verde, 12.4:1 âmbar)
+- [x] `concepts.module.css` `[data-concept='night-harbor']` → inserir `--success`, `--on-success`, `--warning`, `--on-warning` ✅ (dabbe50, FIX-1 semântica)
+- [x] Comentários CSS documentando WCAG ratios (9.7:1 verde, 12.4:1 âmbar) ✅ (dabbe50)
 
 ### Tipografia (AC-007-008)
-- [ ] `global.css` `:root` → inserir `--type-metric`, `--weight-body`, `--weight-label`, `--weight-heading`
-- [ ] `primitives.module.css` → criar `.data` com MONO + tabular-nums
+- [x] `global.css` `:root` → inserir `--type-metric`, `--weight-body`, `--weight-label`, `--weight-heading` ✅ (dabbe50)
+- [x] `primitives.module.css` → criar `.data` com MONO + tabular-nums ✅ (dabbe50)
 
 ### Ícones (AC-009)
-- [ ] `global.css` `:root` → inserir `--icon-sm`, `--icon-md`, `--icon-lg`
-- [ ] `concepts.module.css` `.signatureIcon svg` → usar `var(--icon-md)` em vez de hardcoded 1.2rem
+- [x] `global.css` `:root` → inserir `--icon-sm`, `--icon-md`, `--icon-lg` ✅ (dabbe50)
+- [x] `concepts.module.css` `.signatureIcon svg` → usar `var(--icon-md)` em vez de hardcoded 1.2rem ✅ (dabbe50)
 
 ### Cleanup (AC-010)
-- [ ] `global.css` `:root` → mapear `--ease-standard` e `--duration-fast` como aliases (não deletar)
-- [ ] Comentário TODO com remoção futura (semana que vem)
+- [x] `global.css` `:root` → mapear `--ease-standard` e `--duration-fast` como aliases + novo `--motion-duration-fast: 160ms` ✅ (dabbe50, FIX-2)
+- [x] Comentário TODO com remoção futura ✅ (dabbe50)
 
 ### Verify (AC-011)
-- [ ] `npm run lint` → zero erros
-- [ ] `npm run typecheck` → zero erros TypeScript
-- [ ] `npm run test` → todas as suites passam
-- [ ] Nenhuma regressão em testes existentes
+- [x] `npm run lint` → zero erros ✅ (dabbe50 gate)
+- [x] `npm run typecheck` → zero erros TypeScript ✅ (dabbe50 gate)
+- [x] `npm run test` → todas as suites passam (151/151, +3 motion-tokens.test.ts) ✅ (dabbe50 gate)
+- [x] Nenhuma regressão em testes existentes ✅ (dabbe50 gate, no regressions)
 
 ---
 
@@ -65,23 +65,23 @@
 
 ## Próximas Fases
 
-### Verify (Próximo)
-- **Input**: código implementado em repo
-- **Atividade**: `npm run lint && npm run typecheck && npm run test`
-- **Saída**: Verde (todos os ACs passam) ou lista de erros
-- **Agente**: verify-agent (skill `/verify`)
+### Consolidate (Próximo)
+- **Input**: implementação verde (151/151 testes) + 3 fixes do controller
+- **Atividade**: registrar lessons, atualizar skill, preparar merge
+- **Saída**: handoff-002.md, lessons.md opcional, PR #2 pronto
+- **Agente**: consolidate-agent (dispatcher role)
 
-### Review (Após verify)
-- **Input**: código + testes verdes
-- **Atividade**: code-review de qualidade (simplification, efficiency, bugs)
-- **Saída**: findings ou aprovação
-- **Agente**: code-reviewer (skill `sdd-review`)
+### Merge (Após consolidate)
+- **Input**: consolidation aprovada
+- **Atividade**: merge de PR #2 para feat/scaffold-inicial
+- **Saída**: branch feat/night-harbor-p1-tokens merged
+- **Agente**: controller/dispatcher
 
-### PR (Após review)
-- **Input**: revisão aprovada
-- **Atividade**: criar PR para feat/scaffold-inicial
-- **Saída**: PR URL (aguardando merge)
-- **Agente**: dispatcher/controller
+### P2.1 — StatusChip (Após P1 merge)
+- **Input**: tokens P1 disponíveis em main
+- **Bloqueador**: P1 ✓
+- **Escopo**: StatusChip (dot + ícone + label), usa `--success`, `--warning`, `--on-*`
+- **Esforço**: M
 
 ### P2 — Vocabulário de Componentes
 - **Bloqueador**: P1 ✓
@@ -117,8 +117,12 @@ Handoff: `handoff-001.md` (lido pelo implement-agent)
 | Data | Evento | Agente | Status |
 |------|--------|--------|--------|
 | 2026-07-09 | Criação de spec.md e aprovação | controller/spec-agent | ✓ |
-| 2026-07-09 | Criação de handoff-001.md | dispatcher/handoff-agent | ✓ (este documento) |
-| — | Implementação | implement-agent | ⏳ (aguardando) |
+| 2026-07-09 | Criação de handoff-001.md | dispatcher/handoff-agent | ✓ |
+| 2026-07-09 | Implementação: 12 ACs, 148→151 testes | implement-agent | ✓ |
+| 2026-07-09 | Controller review: FIX-1/2/3, gate verde | controller/review-agent | ✓ |
+| 2026-07-09 | Commits e13d847 + dabbe50 em feat/night-harbor-p1-tokens | controller | ✓ |
+| 2026-07-09 | Criação de handoff-002.md | dispatcher/handoff-agent | ✓ |
+| — | Consolidation: lessons, skill update, merge prep | consolidate-agent | ⏳ (próximo) |
 
 ---
 
