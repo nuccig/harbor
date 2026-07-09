@@ -2,10 +2,11 @@
 
 ## Status Atual
 
-**Fase**: `consolidate`  
+**Fase**: `done` (run encerrada)  
 **Data**: 2026-07-09  
-**Entrada**: implement completa (12 ACs verdes, gate 151/151)  
-**Atividade**: Handoff para consolidate-agent (review, lessons, skill update)
+**Saída**: PR #4 (ready) `feat/night-harbor-p1-tokens` → `codex/issue-29-configuracoes-onboarding-ui` (stacked sobre PR #2)  
+**Consolidação**: learnings.md L-001..L-005 aprovados; SKILL.md atualizado (commit 0a34d89); brain-sync: 3 learnings promovidos ao atlas  
+**Próximo lote**: P2.1+P2.2 da proposta (`.orquestrador/night-harbor-ui-design/proposta-melhorias-001.md` §4) — invocar orquestrador referenciando os IDs P2.x
 
 ---
 
@@ -122,7 +123,9 @@ Handoff: `handoff-001.md` (lido pelo implement-agent)
 | 2026-07-09 | Controller review: FIX-1/2/3, gate verde | controller/review-agent | ✓ |
 | 2026-07-09 | Commits e13d847 + dabbe50 em feat/night-harbor-p1-tokens | controller | ✓ |
 | 2026-07-09 | Criação de handoff-002.md | dispatcher/handoff-agent | ✓ |
-| — | Consolidation: lessons, skill update, merge prep | consolidate-agent | ⏳ (próximo) |
+| 2026-07-09 | Consolidation: learnings.md + SKILL.md (commit 0a34d89), HITL aprovado | consolidate-agent | ✓ |
+| 2026-07-09 | Brain-sync: 3 learnings → atlas/learnings/ (HITL aprovado) | consolidate-agent | ✓ |
+| 2026-07-09 | Push + PR #4 draft → ready (sem CI no repo; gate local verde) | controller | ✓ |
 
 ---
 
