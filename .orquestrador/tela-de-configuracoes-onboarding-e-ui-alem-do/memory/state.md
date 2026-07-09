@@ -4,9 +4,9 @@
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
 - Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval, technical plan approval, task decomposition, cross-artifact analysis, implementation waves 001–007, final manual evidence, final verify
-- Current phase: post-implementation review/consolidation
-- Status: task implementation complete
-- Next: review/fix loop, consolidate, audit, PR checks/ready
+- Current phase: post-review consolidation
+- Status: review-001 clean after re-review; post-review fixes verified and ready to commit
+- Next: commit post-review fixes, consolidate, audit, PR checks/ready
 - Blockers: none
 - Implementation:
   - Task 001 PASS — fresh gate: lint 0, typecheck 0, 51 tests passed.
@@ -18,11 +18,16 @@
   - Task 006 PASS — lint 0, typecheck 0, 148 tests passed, production build 0.
   - Task 007 PASS — 36/36 Electron matrix, 18 screenshots, manual AC-001..AC-038 PASS, lint 0, typecheck 0, 148 tests passed, production build 0, preload smoke `window.harbor.ping()=pong`.
 - Remediations during Task 007:
-  - Signal Poster contrast fixed after evidence found focus/canvas at 1.2:1; final focus/canvas 13.05:1.
+  - Signal Poster contrast fixed after evidence found focus/canvas at 1.2:1; final focus/canvas 12.62:1.
   - Preload build fixed after Electron sandbox rejected ESM syntax in `out/preload/index.mjs`; final file keeps `.mjs` name but emits CJS and the bridge responds `pong`.
+  - Review-001:
+    - 4 medium findings opened: Signal Poster palette drift, Windows unsigned build sign/edit, evidence runtime wording, NightAmbient fallback evidence.
+    - All 4 resolved: Signal Poster restored to black/lavender with focus/canvas 12.62:1; `build.win.signAndEditExecutable=false`; report clarifies Playwright as external harness only; forced fallback confirms `canvasCount=0` and CSS fallback layer.
+    - Fresh gate after source/config fixes: lint 0, typecheck 0, 148 tests passed, build 0, `build:app -- --dir --config.asar=false` 0.
+    - Re-review-001 CLEAN; no `reviews-002` created.
 - Risks:
   - `npm install` reports 18 transitive vulnerabilities; preserve for review instead of changing the approved dependency graph implicitly.
-  - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.94 kB. Review performance before final approval.
+  - Production chunks: main renderer 691.32 kB; lazy NightAmbient 3,102.97 kB. Review performance before final approval.
 - Grill decisions:
   - Deliver three comparable design proposals.
   - Each proposal covers the same onboarding → app shell → settings flow.

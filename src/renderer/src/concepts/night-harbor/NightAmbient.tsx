@@ -4,9 +4,9 @@ import styles from '../concepts.module.css'
 export default function NightAmbient() {
   const supportsGpu =
     typeof window !== 'undefined' &&
-    (typeof navigator !== 'undefined' && 'gpu' in navigator
-      ? true
-      : 'WebGL2RenderingContext' in window)
+    ((typeof navigator !== 'undefined' &&
+      typeof (navigator as Navigator & { gpu?: unknown }).gpu !== 'undefined') ||
+      typeof window.WebGL2RenderingContext !== 'undefined')
 
   return (
     <div
