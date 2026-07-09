@@ -31,13 +31,27 @@ desktop-only filters that govern all UI work. Decision source:
 
 ## Rules (from recorded decisions + design.md)
 
-- **Token system**: Use the 22 tokens defined in `[data-concept='night-harbor']`. Full list:
+- **Token system**: Use the 37+ tokens defined in `[data-concept='night-harbor']`. Full list:
   `--canvas`, `--surface`, `--surface-raised`, `--surface-active`, `--ink`, `--ink-muted`,
   `--accent`, `--on-accent`, `--danger`, `--on-danger`, `--border`, `--focus-ring`,
   `--selection`, `--selection-ink`, `--radius-small`/`control`/`panel`, `--shadow-raised`,
-  `--font-casl`, `--page-gutter`.
+  `--font-casl`, `--page-gutter`; **Status tokens** (P1):
+  `--success`, `--on-success`, `--warning`, `--on-warning`; **Motion tokens** (P1):
+  `--motion-duration: 280ms`, `--motion-duration-exit: 182ms`, `--motion-duration-fast: 160ms`,
+  `--motion-ease: cubic-bezier(0.22, 1, 0.36, 1)`; **Typography tokens** (P1):
+  `--type-metric: clamp(1.6rem, 2.2vw, 2.4rem)`, `--weight-body: 400`, `--weight-label: 520`,
+  `--weight-heading: 650`; **Icon tokens** (P1): `--icon-sm: 1rem`, `--icon-md: 1.2rem`,
+  `--icon-lg: 1.5rem`. **CRITICAL: Semantic meaning of `on-*` tokens** (L-001): `on-*` is text/overlay
+  color OVER the token as background (not vice versa); e.g., `--on-success: #07111f` (dark text) over
+  `--success: #5ad8a6` (green background) = 10.65:1 contrast.
 - **Animation**: 280ms base duration, easing `[0.22,1,0.36,1]`, exit = `0.65 × enter`.
-  150–300ms range for micro-interactions, never >500ms.
+  150–300ms range for micro-interactions, never >500ms. **Motion values** (P1) imported from
+  `src/renderer/src/app/motion-tokens.ts` (TS: `duration: 0.28`, `durationExit: 0.182`,
+  `ease: [0.22,1,0.36,1]`); CSS custom properties in `global.css`. **CRITICAL: exit/enter overrides**
+  (L-004): `motion/react` transition overrides (exit, enter, whileHover, whileTap) do NOT automatically
+  inherit `MotionConfig reducedMotion='user'`. Use explicit ternary before applying transition:
+  `exitTransition = reduceMotion ? { duration: 0.08 } : { duration: motionTokens.durationExit, ease: motionTokens.ease }`.
+  This pattern is boilerplate in ConceptScaffold, DesignLab, and any component overriding motion.
 - **Accessibility CRITICAL**: focus rings visible (2–4px, `--focus-ring`), contrast 4.5:1
   text / 3:1 UI glyphs, color not-only for status (icon+label), `aria-label` on icon-only
   buttons, `aria-live=polite` on toasts, SkipLink preserved, heading hierarchy h1→h6 no skip.
@@ -70,6 +84,12 @@ desktop-only filters that govern all UI work. Decision source:
 - **Never** block the ambient layer behind pointer-events or make it interactive — it's
   decorative.
 - **Never** apply mobile touch/safe-area/bottom-nav rules — Harbor is desktop.
+- **Never** hardcode motion values in TSX — import `motionTokens` from `src/renderer/src/app/motion-tokens.ts`
+  (avoids divergence between TS and CSS, ensures reduceMotion ternary pattern applies; e.g., no
+  `duration: 0.28` inline, use `motionTokens.duration`).
+- **Never** pair `on-*` tokens as text over non-token surfaces — `on-*` is text color OVER the token-color
+  as background, not over arbitrary surfaces. Use text tokens (`--ink`, `--ink-muted`) for non-status
+  surfaces (L-001).
 
 ## References
 

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, type Transition } from 'motion/react'
 import type { ReactNode } from 'react'
 import type { ConceptId } from '../app/index'
+import { motionTokens } from '../app/motion-tokens'
 import type { ConceptLayoutProps } from './types'
 import styles from './concepts.module.css'
 
@@ -27,6 +28,9 @@ export function ConceptScaffold({
 }: ConceptScaffoldProps) {
   const offset = reduceMotion ? 0 : travel
   const activeTransition = reduceMotion ? { duration: 0.08 } : transition
+  const exitTransition = reduceMotion
+    ? activeTransition
+    : { duration: motionTokens.durationExit, ease: motionTokens.ease }
 
   return (
     <div
@@ -56,7 +60,12 @@ export function ConceptScaffold({
             animate={{ opacity: 1, x: 0, y: 0 }}
             className={styles.product}
             data-concept-slot="product"
-            exit={{ opacity: 0, x: -offset, y: concept === 'signal-poster' ? 0 : -offset }}
+            exit={{
+              opacity: 0,
+              x: -offset,
+              y: concept === 'signal-poster' ? 0 : -offset,
+              transition: exitTransition
+            }}
             initial={{
               opacity: 0,
               x: offset,

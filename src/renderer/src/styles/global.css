@@ -24,9 +24,25 @@
   --type-body: 0.95rem;
   --type-large: 1.125rem;
   --type-title: clamp(2rem, 4vw, 4.5rem);
-  --duration-fast: 160ms;
+  --type-metric: clamp(1.6rem, 2.2vw, 2.4rem);
+  --weight-body: 400;
+  --weight-label: 520;
+  --weight-heading: 650;
+  --icon-sm: 1rem;
+  --icon-md: 1.2rem;
+  --icon-lg: 1.5rem;
+
+  /* Motion tokens (AC-001). Fast tier = micro-interactions (hover/press); base = presence. */
+  --motion-duration: 280ms;
+  --motion-duration-exit: 182ms;
+  --motion-duration-fast: 160ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Legacy aliases (AC-010 — deprecated, remove after week of 2026-07-16) */
+  --duration-fast: var(--motion-duration-fast);
+  --ease-standard: var(--motion-ease);
   --duration-loading: 760ms;
-  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+
   --layer-skip-link: 40;
   --layer-toast: 60;
 }
