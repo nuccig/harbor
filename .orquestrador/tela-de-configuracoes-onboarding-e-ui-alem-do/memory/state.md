@@ -3,10 +3,10 @@
 - Issue: nucci-projects #29
 - Mode: full pipeline + audit
 - Branch: `codex/issue-29-configuracoes-onboarding-ui`
-- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall
-- Current phase: spec
+- Completed: issue-source resolution, issue derivation, triage, branch creation, constitution approval, brain recall, grill-me, spec approval
+- Current phase: spec → plan handoff
 - Status: in progress
-- Next: grill-me, spec
+- Next: technical plan and ADR approval
 - Blockers: none
 - Grill decisions:
   - Deliver three comparable design proposals.
