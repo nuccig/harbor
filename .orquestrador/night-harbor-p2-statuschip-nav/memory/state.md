@@ -2,8 +2,11 @@
 
 ## Status Atual
 
-**Fase**: spec (em andamento)
-**Data**: 2026-07-09
+**Fase**: `done` (run encerrada)
+**Data**: 2026-07-10
+**Saída**: PR #5 (ready) `feat/night-harbor-p2-statuschip-nav` → `feat/night-harbor-p1-tokens` (stacked sobre PR #4; cadeia #2 ← #4 ← #5)
+**Consolidação**: learnings L1–L11; skill harbor-night-harbor-ui atualizada; ADR-0014 em docs/adr/; brain-sync: 2 notas novas no atlas + 2 cross-links
+**Próximo lote**: P2.3 (KPI strip + sparkline-maré) da proposta (`.orquestrador/night-harbor-ui-design/proposta-melhorias-001.md` §4) — depois P2.4–P2.6
 **Branch**: feat/night-harbor-p2-statuschip-nav (stacked sobre feat/night-harbor-p1-tokens / PR #4)
 **Modo**: pipeline normal (sem --audit)
 **Origem**: proposta-melhorias-001.md §4 — P2.1 (StatusChip) + P2.2 (nav ícone+label)
@@ -53,7 +56,7 @@
 | 18 Handoff →consolidate | ✓ handoff-006.md |
 | 19 Consolidate | ✓ HITL 4/4 aprovados: skill update, ADR-0014, 2 notas atlas |
 | 19.5 Brain-sync | ✓ atlas: contrast-math-by-script + css-module-class-asserts (+2 cross-links) |
-| 23 PR | em andamento |
+| 23 PR | ✓ PR #5 ready (sem CI no repo; gate local verde — precedente P1) |
 
 ## Decisões do gate do plan (vinculantes, incorporadas na rev. 2)
 
