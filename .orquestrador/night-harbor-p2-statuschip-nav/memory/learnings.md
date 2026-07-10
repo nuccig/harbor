@@ -200,18 +200,78 @@ mou decisões design (mapeamento semântico, color-mix fallback, motion ternári
 
 ---
 
+### L10: CSS Module Substring Assertions (Vite Hashing)
+
+**Contexto**: Review + fix phase (finding 201, test refactoring)
+**Descrição**: Vite hasha CSS Module class names em runtime (ex: `.statusChip_success` → `.statusChip_success__abc123` pós-compilação). Assertions diretas com `.toHaveClass('statusChip_success')` falham em output hashado.
+
+**Técnica correta**:
+```typescript
+// ❌ ERRADO
+expect(element).toHaveClass('statusChip_success')
+
+// ✓ CORRETO — substring match
+const chip = screen.getByText('label').closest('[class*="statusChip"]')
+expect(chip?.className).toContain('statusChip_success')
+```
+
+**Implicação**:
+1. Qualquer componente com CSS Modules em testes deve usar substring matching
+2. Padrão é agnóstico a bundler (Webpack, Vite, etc)
+3. Helper reutilizável: `expectStatusChip(label, expectedTone)` em shell-settings.test.tsx linha 88–106
+
+**Reusabilidade**: ALTA — padrão imediatamente aplicável a todos os component tests com CSS Modules
+
+**Candidato Atlas**: SIM — "Testing Patterns" / "CSS Module Test Assertions"
+
+**Referência**: handoff-005.md Finding 201, shell-settings.test.tsx (helper `expectStatusChip`), 000-clean.md (confirmado PASS)
+
+---
+
+### L11: Parameterize Mock-Dependent Assertions
+
+**Contexto**: Review + fix phase (finding 101, brittleness refactoring)
+**Descrição**: Assertions atadas a valores hardcoded derivados de fixtures (ex: `expect(...).toHaveLength(3)` amarrado a `mockCatalog.agents.length`) falham ambiguamente se dados mock mudarem — impossível distinguir bug de código vs. mudança intencional de mock.
+
+**Solução**:
+```typescript
+// ❌ FRÁGIL
+const availableAgentsCount = 3
+expect(...).toHaveLength(availableAgentsCount)
+
+// ✓ MANTÍVEL
+const availableAgentsCount = mockCatalog.agents
+  .filter(agent => agent.status === 'Available').length
+expect(...).toHaveLength(availableAgentsCount)
+```
+
+**Implicação**:
+1. Qualquer assertion derivando de fixture data deve parameterizar counts/IDs/valores da fonte, nunca hardcoded
+2. Refatoração de mock não quebra testes ambiguamente
+3. Documentação clara: variável parametrizada comunica intenção
+
+**Reusabilidade**: ALTA — aplicável a todos os testes com mocked catalogs/lookup tables
+
+**Candidato Atlas**: SIM — "Testing Best Practices" / "Fixture-Dependent Assertions"
+
+**Referência**: handoff-005.md Finding 101, shell-settings.test.tsx line 362, 000-clean.md (confirmado PASS após fix a2d888a)
+
+---
+
 ## Status das Learnings na Run P2 — Consolidado
 
-| # | Learning | Criticidade | Adotado Spec? | Status Plan | Status Tasks | Status Implement |
-|---|----------|-------------|---------------|-------------|-----------|-------------|
-| L1 | On-token semantics | ALTA | Sim (AC-10) | Validado + reforçado (L8) | Confiar em ADR-0001; testable | Implementado conforme |
-| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Cumprido: auditoria manual exata | Re-validate se hex mudar | Hex confirmado var(), nenhuma mudança |
-| L3 | Navbar color-mix technique | ALTA | Sim (§5.2) | Implementado: fallback @supports | Verificar CSS corretude | CSS auditado ✓ (fallback + @supports) |
-| L4 | Motion reduced-motion ternário | ALTA | Parcial | N/A (P2.1+P2.2 sem motion) | Re-aplicar em P3+ se motion | Nenhuma motion nova (OK) |
-| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1) | Resolvido: ratios exatos (7.10–8.48) | Confiar em contrast-audit.md | Ratios do plan não mudaram |
-| L6 | Audit luminâncias exatas | CRÍTICA | N/A | Aplicado: rev. 2 corrigiu rev. 1 | N/A (audit já feita) | N/A (audit no plan) |
-| L7 | Retry session limit | MÉDIA | N/A | Ocorreu + resolvido | Monitora | N/A |
-| L8 | On-token fill sólido | ALTA | Novo | Validado: reservados para D-007 | Documentado em ADR-0001 | Implementado: on-* zero em StatusChip |
-| L9 | Icon sizing default 1em | MÉDIA | Novo | N/A | N/A | Implementado; customização future OK |
-| P1 | Gate confirmation aberto | MÉDIA | Sim | Aplicado: 6 decisões do gate | Continuar pattern | N/A |
-| P2 | Brain recall alignment | ALTA | Sim | Cumprido | Continuar antes de plan | N/A |
+| # | Learning | Criticidade | Adotado Spec? | Status Plan | Status Tasks | Status Implement | Status Review+Fix |
+|---|----------|-------------|---------------|-------------|-----------|-------------|-------------|
+| L1 | On-token semantics | ALTA | Sim (AC-10) | Validado + reforçado (L8) | Confiar em ADR-0001; testable | Implementado conforme | Validado ✓ |
+| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Cumprido: auditoria manual exata | Re-validate se hex mudar | Hex confirmado var(), nenhuma mudança | Confirmado (ac-10) |
+| L3 | Navbar color-mix technique | ALTA | Sim (§5.2) | Implementado: fallback @supports | Verificar CSS corretude | CSS auditado ✓ (fallback + @supports) | Validado ✓ |
+| L4 | Motion reduced-motion ternário | ALTA | Parcial | N/A (P2.1+P2.2 sem motion) | Re-aplicar em P3+ se motion | Nenhuma motion nova (OK) | N/A |
+| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1) | Resolvido: ratios exatos (7.10–8.48) | Confiar em contrast-audit.md | Ratios do plan não mudaram | Ratios mantidos ✓ |
+| L6 | Audit luminâncias exatas | CRÍTICA | N/A | Aplicado: rev. 2 corrigiu rev. 1 | N/A (audit já feita) | N/A (audit no plan) | Candidato Atlas (AC-010a) |
+| L7 | Retry session limit | MÉDIA | N/A | Ocorreu + resolvido | Monitora | N/A | N/A |
+| L8 | On-token fill sólido | ALTA | Novo | Validado: reservados para D-007 | Documentado em ADR-0001 | Implementado: on-* zero em StatusChip | Validado ✓ |
+| L9 | Icon sizing default 1em | MÉDIA | Novo | N/A | N/A | Implementado; customização future OK | Confirmado ✓ |
+| L10 | CSS Module substring assertions | MÉDIA | N/A | N/A | N/A | N/A | Novo (fix 201): candidato atlas (AC-020b) |
+| L11 | Parameterize mock-dependent assertions | MÉDIA | N/A | N/A | N/A | N/A | Novo (fix 101): candidato atlas (AC-030c) |
+| P1 | Gate confirmation aberto | MÉDIA | Sim | Aplicado: 6 decisões do gate | Continuar pattern | N/A | Resolvido ✓ |
+| P2 | Brain recall alignment | ALTA | Sim | Cumprido | Continuar antes de plan | N/A | Validado ✓ |

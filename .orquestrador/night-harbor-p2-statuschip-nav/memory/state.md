@@ -49,8 +49,11 @@
 | 14 Handoff →fix | ✓ handoff-005.md |
 | 15 Fix | ✓ 101+201 resolvidos (a2d888a) |
 | 16 Verify | ✓ 164/164 (controller) |
-| 17 Re-review | em andamento |
-| 18+ | pendente |
+| 17 Re-review | ✓ round 001 CLEAN (2d60dd6) |
+| 18 Handoff →consolidate | ✓ handoff-006.md |
+| 19 Consolidate | ✓ HITL 4/4 aprovados: skill update, ADR-0014, 2 notas atlas |
+| 19.5 Brain-sync | ✓ atlas: contrast-math-by-script + css-module-class-asserts (+2 cross-links) |
+| 23 PR | em andamento |
 
 ## Decisões do gate do plan (vinculantes, incorporadas na rev. 2)
 
