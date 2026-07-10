@@ -248,6 +248,66 @@ já aplicada aqui pelo analyze-agent e incorporada ao texto da task 003 pelo con
 
 ---
 
+## Descobertas Desta Run (handoff implement→review, 2026-07-10)
+
+### N12: Recharts Aplica `className` do `<Bar>` no `<g>` Wrapper E em Cada `<path>`
+
+**Contexto**: Descoberta empírica do implement-agent da task 002 ao escrever o teste de
+contagem de barras da sparkline (`tests/renderer/ui/metric-tile.test.tsx`).
+**Descrição**: A prop `className` passada a `<Bar>` não aparece só nos elementos `<path
+class="recharts-rectangle">` individuais (já sabido desde N6/ADR-0002/0003) — ela **também**
+aparece no `<g>` wrapper que agrupa todos os paths daquela série. Um selector ingênuo tipo
+`querySelectorAll('[class*="metricSparkBar"]')` conta o `<g>` + N `<path>`s, não N.
+
+**Implicação**: qualquer teste que conte "número de barras" de um `<Bar>` do Recharts precisa
+filtrar por `tagName === 'path'` (ou usar um seletor mais específico como
+`.recharts-rectangle`) antes de comparar com `series.length` — contar por classe crua
+superestima em +1.
+
+**Referência**: `tests/renderer/ui/metric-tile.test.tsx`; report da task 002 (descoberta (a)).
+
+---
+
+### N13: `JavascriptAnimate` do Recharts 3 Lê `window.matchMedia` Mesmo com `isAnimationActive={false}`
+
+**Contexto**: Mesma task 002 — teste inicial quebrava ao montar `<Bar>` mesmo com toda
+animação desligada por prop.
+**Descrição**: Internamente, o `<Bar>` do Recharts 3 monta um componente `JavascriptAnimate`
+que consulta `window.matchMedia('(prefers-reduced-motion)')` e chama `.addEventListener` na
+`MediaQueryList` retornada — isso acontece incondicionalmente no mount, independente do valor
+de `isAnimationActive`. Um mock simples de `matchMedia` que retorna só `{ matches: boolean }`
+(sem `addEventListener`/`removeEventListener`) quebra o mount com um erro de função ausente.
+
+**Implicação**: qualquer teste que monte um componente Recharts em jsdom precisa de um stub
+completo de `MediaQueryList` (`matches`, `addEventListener`, `removeEventListener`, idealmente
+também `addListener`/`removeListener` para compat legada) no mock global de `matchMedia` — não
+basta o padrão mínimo usado para testar CSS `@media` condicional em componentes não-Recharts.
+
+**Referência**: `tests/renderer/ui/metric-tile.test.tsx`; report da task 002 (descoberta (b)).
+
+---
+
+### N14: IDs Voláteis do Recharts/React Precisam Ser Normalizados Antes de Comparar `innerHTML`
+
+**Contexto**: Mesma task 002 — teste de equivalência reduced-motion on/off (AC-015) comparava
+`innerHTML` do componente montado nos dois estados, esperando markup idêntico.
+**Descrição**: Recharts gera IDs não-determinísticos por render (`recharts<N>-clip` para
+`<clipPath>`) e o React 18 também gera seus próprios IDs voláteis (`:r<N>:`, via `useId`) em
+elementos internos. Dois mounts do mesmo componente, mesmo com dados idênticos, produzem
+`innerHTML` que difere apenas nesses IDs — uma comparação direta de string falha por um motivo
+espúrio, não por diferença real de markup.
+
+**Implicação**: qualquer teste de "renderização idêntica em dois cenários" que compare
+`innerHTML`/snapshot de um componente Recharts (ou qualquer componente que use `useId`)
+precisa normalizar esses IDs voláteis (regex de substituição por um placeholder fixo) antes da
+comparação — comparação crua de string é falso-negativo garantido, não uma proteção real
+contra regressão visual.
+
+**Referência**: `tests/renderer/ui/metric-tile.test.tsx`; report da task 002 (descoberta (c));
+AC-015/016 (sparkline estática, comportamento idêntico independente de reduced-motion).
+
+---
+
 ## Rastreabilidade
 
 - **Learnings herdados**: atlas + `.orquestrador/night-harbor-p2-statuschip-nav/memory/learnings.md`
@@ -260,6 +320,8 @@ já aplicada aqui pelo analyze-agent e incorporada ao texto da task 003 pelo con
   confirmam previsões anteriores contra o particionamento real; N10 e N11 formalizam achados do
   analyze-agent já incorporados às tasks pelo controller, tornando-os reaproveitáveis fora desta
   feature).
-- **Próxima atualização**: sdd-implement deve confirmar que o verify gate conjunto (001+002) foi
-  de fato executado antes de 003 iniciar, e registrar qualquer learning novo sobre o comportamento
-  real do `npm install recharts` (versões instaladas de fato, efeitos colaterais no lockfile).
+- **N12–N14**: descobertas do handoff-agent na fase implement→review, 2026-07-10, formalizando
+  as 3 descobertas empíricas reportadas pelo implement-agent da task 002 (Recharts × jsdom/teste)
+  como learnings reaproveitáveis para qualquer componente futuro que use Recharts neste projeto.
+- **Próxima atualização**: sdd-review deve registrar aqui qualquer achado novo de arquitetura ou
+  padrão de teste que surgir das 5 dimensões de review, se for reaproveitável fora desta feature.
