@@ -2,7 +2,7 @@
 
 ## Status Atual
 
-**Fase**: spec aprovada → handoff spec→plan
+**Fase**: plan aprovado → handoff plan→tasks
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
@@ -36,6 +36,14 @@
 | 1 Constitution | ✓ aprovada (reuso P2 c/ ajustes) |
 | 2 Grill-me | ✓ (4 perguntas; G3 revisada p/ Recharts a pedido do usuário) |
 | 3 Spec | ✓ aprovada HITL (18 ACs EARS) |
-| 4 Handoff spec→plan | em andamento |
+| 4 Handoff spec→plan | ✓ handoff-001.md |
+| 5 Plan | ✓ aprovado HITL (3 ADRs; contrast-audit reconfirmado pelo controller por script; trade-off AC-014 = A accent nativo; copy "Key metrics" mantida). Nota: plan-agent caiu 1× por session limit; retomado via SendMessage (protocolo contract.md) e concluiu |
+
+## Decisões do gate do plan (vinculantes)
+
+1. AC-014 "degradação neutra" = interpretação A: legados renderizam com accent nativo (verde command-deck / roxo signal-poster); zero código por concept; ratios auditados ≥3:1 nos 3.
+2. Copy: grupo "Key metrics"; tiles "Active agents / Issue queue / Success rate / Agent time".
+3. Sparkline: `fill: var(--accent, var(--border))` + `fill-opacity: 0.75` (4.16/3.64/3.80:1); numeral `var(--ink)` sobre `var(--surface-raised)` (14.09/16.96/15.78:1) — reconfirmados pelo controller (scratchpad/contrast-check.js).
+4. Recharts ^3.9.2: `{ Bar, BarChart }` only, 48×16 fixo, margin zerado, `accessibilityLayer={false}`, `isAnimationActive={false}`, setup.ts intocado.
 
 **Última atualização**: 2026-07-10 — controller (spec aprovada)
