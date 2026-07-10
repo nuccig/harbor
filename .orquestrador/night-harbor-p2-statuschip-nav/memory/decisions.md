@@ -137,17 +137,121 @@ radation)
 
 ---
 
+## Decisões Aprovadas (plan HITL 2026-07-09 — rev. 2 pós-correção)
+
+### D-007: Fundo Tintado — Color-mix 85% + Texto Cor do Token
+
+**Data**: 2026-07-09 (plan gate, decisão do usuário)
+**Status**: APROVADO (vinculante)
+**Origem**: ADR-0001 (fundo tintado color-mix 85% com texto na cor do token e fallback surface-raised)
+
+**Esquema final**:
+- Fundo: `color-mix(in srgb, var(--tone), transparent 85%)` (85% conforme spec)
+- Texto/ícone/dot: **cor do token** (`--success`/`--warning`/`--danger`); neutral → `--ink-muted`
+- Fallback sem color-mix: background **sólido** `var(--surface-raised)` (#152642) — NUNCA color-mix no fallback
+- Tokens `--on-*` **não aparecem no chip** (reservados a fills sólidos futuros — pair `--on-success` sobre `--success` sólido = 10.65:1 ✓)
+
+**Ratios WCAG (controller, linearização sRGB exato)**:
+- Tintado 85%: success 7.10:1, warning 8.48:1, danger 6.08:1, neutral 7.97:1 — todos AA ✓
+- Fallback sólido: success 8.51:1, warning 10.49:1, danger 6.88:1, neutral 7.74:1 — todos AA ✓
+
+**Motivo da mudança (rev. 1 → rev. 2)**: Auditoria numérica exata do controller (WCAG 2.1, luminância relativa com linearização sRGB expoente 2.4) confirmou que esquema original (on-* sobre tintado) falhava em qualquer transparência (1.50:1 @85%, 1.71:1 @80%). Incompatibilidade estrutural: on-* são escuros, fundo tintado é escuro (mistura com `--surface` #0e1b2f, L ≈ 0.011). Texto escuro sobre fundo escuro falha. Resolução: trocar texto para cor do token (clara).
+
+**Referência**: plan.md §2.5, §2.7; ADR-0001; contrast-audit.md rev. 2
+
+---
+
+### D-008: StatusChip API — Props Tone/Label/Icon (opcional)
+
+**Data**: 2026-07-09 (plan gate)
+**Status**: APROVADO (vinculante)
+**Origem**: ADR-0002 (StatusChip API e estrutura de componente)
+
+**Props**:
+- `tone`: 'success' | 'warning' | 'danger' | 'neutral' (enum semântico)
+- `label`: string (comunicação primária, acessível)
+- `icon`?: React.ComponentType (optional, override; default por tone garante color-not-only)
+
+**Render**: `<span className={statusChip statusChip_${tone}}><span statusDot /><Icon statusIcon /><span statusLabel>{label}</span></span>`
+**Acessibilidade**: dot + icon = aria-hidden="true" (decorativos), label = texto (comunica tudo)
+**CSS**: Ver D-007 (esquema de cor); sem transitions próprias (componente informativo)
+
+**Referência**: plan.md §2.1; ADR-0002
+
+---
+
+### D-009: Ícones Phosphor Regular — StatusChip + Nav
+
+**Data**: 2026-07-09 (plan gate, confirmado por ADR-0004)
+**Status**: APROVADO (vinculante)
+**Origem**: ADR-0003 (Nav ícone+label Phosphor Regular); ADR-0002 (defaultIconsByTone)
+
+**StatusChip defaults**:
+- success → CheckCircle
+- warning → Clock
+- danger → Warning
+- neutral → Minus
+
+**Nav lateral**: Compass (overview), FolderOpen (projects), Boat (sessions — metáfora porto, gate G3), Tray (issues), GearSix (settings)
+
+**Peso**: Regular, explícito em `weight="regular"` (ADR-0004 define Phosphor Regular como set único Night Harbor; não duplicar Iconoir)
+
+**Bundle**: Tree-shake minimiza (~5 ícones + 5 nav); acceptable.
+
+**Referência**: plan.md §2.3, §2.6; ADR-0003
+
+---
+
+### D-010: Mapeamento Status→Tone — Inline Shell/Settings
+
+**Data**: 2026-07-09 (plan gate, decisão do usuário no gate)
+**Status**: APROVADO (vinculante)
+**Origem**: plan.md §2.2; spec.md §4
+
+**Mapeamento aprovado**:
+- Sessions: Running→success, Ready→warning, Complete→neutral
+- Issues: High→danger, Medium→warning, Low→neutral
+- Project: Active→success
+- Agents: Available→success, else→neutral
+- Integrations: Not configured→warning, Simulated→neutral, else→neutral
+
+**Implementação**: Mapper funções inline em Shell.tsx e Settings.tsx (transparência semântica: mapeamento vive onde é usado)
+**Refatoração**: Só se terceiro consumidor surgir (não antecipe; YAGNI)
+
+**Referência**: plan.md §2.2; D-001 anterior (mapeamento já aprovado em spec)
+
+---
+
+### D-011: Fallback Legados — Cadeia Var() + Surface-raised
+
+**Data**: 2026-07-09 (plan gate, grill G4)
+**Status**: APROVADO (vinculante)
+**Origem**: plan.md §2.10; spec.md §3.1
+
+**Portabilidade**:
+- StatusChip renderizado sob command-deck/signal-poster (que não definem `--success`/`--warning`) degrada para comportamento neutro legível via cadeia var()
+- Texto: `var(--success, var(--ink-muted))` → sob legado resolve para `--ink-muted`
+- Tone (borda/mix): `var(--success, var(--border))` → sob legado resolve para `--border`
+- Fundo fallback: `var(--surface-raised)` → existe nos 3 conceitos
+
+**Consequence**: Zero edição em blocos legados de concepts.module.css (command-deck, signal-poster, on-* definitions intocados)
+
+**Referência**: plan.md §2.10; ADR-0001
+
+---
+
 ## Decisões Aguardando Confirmação
 
-Nenhuma. Todos os pontos abertos em spec §7 foram confirmados no gate HITL 2026-07-09.
+Nenhuma. Todos os pontos abertos em spec §7 foram resolvidos no gate HITL 2026-07-09. Plan rev. 2 (pós-gate) consolidou decisões D-007 a D-011 e fechou riscos R1–R4.
 
 ---
 
 ## Rastreabilidade
 
-- **Aprovação**: spec.md status header (HITL 2026-07-09)
-- **Confirmações gate**: mapeamento Settings (Available→success, Simulated→neutral, Not configured→warning)
-- **Grill-me decisões**: G1–G4 em state.md
-- **Boundary verificação**: constitution.md test_expectations + boundaries
+- **Aprovação spec**: spec.md status header (HITL 2026-07-09)
+- **Aprovação plan**: plan.md rev. 2 (HITL 2026-07-09 pós-auditoria numérica do controller)
+- **Confirmações gate**: 6 decisões vinculantes (state.md) — decisões de cor (D-007), ícones (D-009), mapeamento (D-010), fallback legados (D-011) consolidadas em ADRs
+- **ADRs técnicos**: 0001 (contraste/fallback), 0002 (API/CSS), 0003 (nav ícone+label)
+- **Boundary verificação**: constitution.md test_expectations (auditoria numérico de contraste obrigatória — cumprida no gate)
 
-**Próxima atualização**: após sdd-plan (ADRs técnicos, riscos resolvidos R1–R4).
+**Próxima atualização**: sdd-tasks (task breakdown); sdd-implement (verificação CSS/render); sdd-verify (tests passam, lint OK)

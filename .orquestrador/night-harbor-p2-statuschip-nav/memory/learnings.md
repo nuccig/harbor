@@ -112,21 +112,87 @@ mou decisões design (mapeamento semântico, color-mix fallback, motion ternári
 
 ---
 
+## Learnings da Run Plan (sdd-plan 2026-07-09)
+
+### L6: Audit de Contraste Deve Incluir Luminâncias Exatas (Criticidade CRÍTICA)
+
+**Contexto**: Plan rev. 1 vs rev. 2
+**Descrição**: Primeira iteração do plan cometeu erros graves em auditoria de contraste:
+- L(#0e1b2f) estimado ~0.095/0.15; valor exato ≈ 0.011 (diferença massiva)
+- Descoberta 8 inverteu fórmula WCAG: `contraste = (L1 + 0.05) / (L2 + 0.05)` foi colocada cor clara no denominador → reportou 0.189:1 para `--ink` sobre fundo tintado success, quando correto é 11.75:1
+- Ratios finais alteraram drasticamente: tintado 80% on-success passou de "borderline 1.71:1" para "desaprovado" após linearização correta
+
+**Implicação**:
+1. Auditoria de contraste **NUNCA** deve usar aproximações visuais ou ferramentas caixa-preta
+2. Cálculo deve incluir linearização sRGB com expoente 2.4 (WCAG 2.1 exato)
+3. Verificar fórmula: `contraste = max(L1, L2) + 0.05) / (min(L1, L2) + 0.05)`; cor mais clara sempre no numerador
+4. Usar ferramentas que expliquem luminâncias (não só "pass/fail" binário)
+
+**Ação próxima run**: Se audit de contraste for necessária, incluir luminâncias calculadas (sRGB linear, expoente 2.4) ou usar ferramenta auditada (ex: WCAG contrast checker com debug info)
+
+**Aplicação nesta run**: Plan rev. 2 incorporou auditoria numérica exata do controller (linearização correta); todos os ratios cumprindo AA ✓
+
+**Referência**: contrast-audit.md rev. 2 (ERRATA), plan.md §2.7, ADR-0001
+
+---
+
+### L7: Plan-Agent Session Limit — Protocolo de Retry (Processo)
+
+**Contexto**: Plan execution
+**Descrição**: Subagent sdd-plan falhou 1× por session limit durante correção de contraste rev. 1 → rev. 2. Retry único (conforme contract.md) completou com sucesso.
+
+**Implicação**:
+1. Session limits são raros mas ocorrem em correções iterativas
+2. Retry protocolo (max 1 retry per phase) é eficaz
+3. Handoff intermediário foi preservado; nenhuma trabalho perdido
+
+**Ação próxima run**: Monitorar se fases com "correção numérica" (contrast, etc) recorrem mais frequentemente a session limit; considerar aumento de tempo limite ou divisão em sub-tasks.
+
+**Aplicação nesta run**: Plan rev. 2 convergiu com sucesso após retry
+
+**Referência**: state.md ("Nota de processo: plan-agent caiu 1× por session limit...")
+
+---
+
+### L8: On-Token Semantics — Restrição a Fill Sólido (Validada + Reforçada)
+
+**Contexto**: Plan approving decision D-007
+**Descrição**: L1 teorizava que `--on-*` = "texto sobre o token como fundo"; plan validou e reforçou:
+- `--on-success` (#07111f) sobre `--success` (#5ad8a6) sólido = 10.65:1 ✓
+- `--on-success` sobre `color-mix(--success, transparent 85%)` tintado = 1.50:1 ✗
+
+**Implicação**:
+1. `--on-*` é semântica de **fill sólido**, não fundo tintado
+2. Qualquer componente com fundo tintado/transparente deve evitar on-tokens; usar cor do token ou alternativa auditada
+3. On-* é par acoplado: só use `--on-X` quando fundo for `--X` sólido puro (não modificado)
+
+**Consequência nesta run**: ADR-0001 reservou on-* para futuros fills sólidos; StatusChip não os usa
+
+**Aplicação futura**: Qualquer badge/button/etc com `background: var(--X)` sólido pode usar `color: var(--on-X)` com confiança (auditado)
+
+**Referência**: L1 anterior, ADR-0001, contrast-audit.md Descoberta 3
+
+---
+
 ## Rastreabilidade
 
-- **L1–L4 origem**: state.md Brain Recall (2026-07-09)
-- **L5 origem**: Análise spec.md §6.1 + handoff-agent (2026-07-09)
-- **P1–P2 origem**: Análise dispatch + spec flow (2026-07-09)
-- **Próxima atualização**: sdd-plan (ADRs técnicos), sdd-verify (audit resultados)
+- **L1–L4 origem**: state.md Brain Recall (spec, 2026-07-09)
+- **L5 origem**: Análise spec.md §6.1 (handoff-spec, 2026-07-09)
+- **P1–P2 origem**: Análise dispatch + spec flow (handoff-spec, 2026-07-09)
+- **L6–L8 origem**: Plan gate analysis + ADR-0001 + contrast-audit.md (plan, 2026-07-09)
+- **Próxima atualização**: sdd-tasks (task breakdown), sdd-implement (CSS conformance), sdd-verify (audit re-validate se cores mudarem)
 
-## Status das Learnings na Run P2
+## Status das Learnings na Run P2 — Consolidado
 
-| # | Learning | Criticidade | Adotado Spec? | Status Plan |
-|---|----------|-------------|---------------|-------------|
-| L1 | On-token semantics | ALTA | Sim (AC-10, refs) | Verificar em StatusChip contraste numérico |
-| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Executar audit externa; não confiar em gate lint |
-| L3 | Navbar color-mix technique | ALTA | Sim (§5.2, AC-6) | Implementar fallback @supports exato |
-| L4 | Motion reduced-motion ternário | ALTA | Parcial (spec omite motion) | Se motion adicionado, ternário obrigatório (R4) |
-| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1, AC-10) | Cálculo luminância relativa obrigatório |
-| P1 | Gate confirmation ponto aberto | MÉDIA | Sim (mapeamento Settings) | Aplicar a próximas specs |
-| P2 | Brain recall stack alignment | ALTA | Sim (incorporado design) | Continuar consulta antes de plan |
+| # | Learning | Criticidade | Adotado Spec? | Status Plan | Status Tasks |
+|---|----------|-------------|---------------|-------------|-----------|
+| L1 | On-token semantics | ALTA | Sim (AC-10) | Validado + reforçado (L8) | Confiar em ADR-0001; testable |
+| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Cumprido: auditoria manual exata | Re-validate se hex mudar |
+| L3 | Navbar color-mix technique | ALTA | Sim (§5.2) | Implementado: fallback @supports | Verificar CSS corretude |
+| L4 | Motion reduced-motion ternário | ALTA | Parcial | N/A (P2.1+P2.2 sem motion) | Re-aplicar em P3+ se motion |
+| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1) | Resolvido: ratios exatos (7.10–8.48) | Confiar em contrast-audit.md |
+| L6 | Audit luminâncias exatas | CRÍTICA | N/A | Aplicado: rev. 2 corrigiu rev. 1 | N/A (audit já feita) |
+| L7 | Retry session limit | MÉDIA | N/A | Ocorreu + resolvido | Monitora |
+| L8 | On-token fill sólido | ALTA | Novo | Validado: reservados para D-007 | Documentado em ADR-0001 |
+| P1 | Gate confirmation aberto | MÉDIA | Sim | Aplicado: 6 decisões do gate | Continuar pattern |
+| P2 | Brain recall alignment | ALTA | Sim | Cumprido | Continuar antes de plan |
