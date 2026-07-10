@@ -2,7 +2,7 @@
 
 ## Status Atual
 
-**Fase**: review clean → consolidate
+**Fase**: consolidate + brain-sync ✓ → PR
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
@@ -58,6 +58,12 @@
 | 16 Verify | ✓ controller: 185/185 |
 | 17 Re-review | ✓ CLEAN (000-recheck-clean.md), verificação independente |
 | — Visual | HITL: seguir precedente P2 — sem screenshot; gap documentado no round summary |
+| 18 Handoff →consolidate | ✓ handoff-006.md |
+| 19 Consolidate | ✓ HITL 8/8 aprovados: skill harbor-night-harbor-ui atualizada, ADR-0015/0016 em docs/adr/, regra dura de contraste-no-plan na fonte opencode (sdd-plan + constitution-template) + sync rodado |
+| 19.5 Brain-sync | ✓ atlas: recharts-jsdom-testing-gotchas + parallel-tasks-symbol-coupling-joint-verify-gate (novas), cross-links em contrast-math-by-script e css-module-class-asserts, index atualizado |
+
+Nota de processo: consolidate-agent caiu 1× (sessão anterior do harness encerrou); retomado via SendMessage do transcript e concluiu — mesmo protocolo do plan-agent.
+Pendente pós-merge: cleanup sdd-memory (arquivar handoffs, compactar).
 
 Learning novo do implement (p/ consolidate): Recharts 3 `<Bar>` monta `JavascriptAnimate` que lê `window.matchMedia('(prefers-reduced-motion)')` e chama `.addEventListener` MESMO com `isAnimationActive={false}` — mock simples `{ matches }` quebra o mount; teste precisa de stub completo de MediaQueryList. Recharts também aplica a className do `<Bar>` no `<g>` wrapper além de cada `<path>` (contagem de barras deve filtrar por tagName).
 
