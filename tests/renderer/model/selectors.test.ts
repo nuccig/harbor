@@ -63,6 +63,7 @@ describe('scenario selectors', () => {
     expect(view.issueQueue.status).toBe(status)
     expect(view.recentUsage.status).toBe(status)
     expect(view.activity.status).toBe(status)
+    expect(view.kpis.status).toBe(status)
     expect(state.concept).toBe('command-deck')
     expect(state.onboardingStep).toBe('welcome')
   })
@@ -101,6 +102,40 @@ describe('scenario selectors', () => {
     })
   })
 
+  it('uses deterministic loading copy for the KPI slice', () => {
+    const state = withScenario(createInitialExperienceState(), 'loading')
+    const view = selectOverviewView(state)
+
+    expect(view.kpis).toEqual({
+      status: 'loading',
+      label: 'Loading key metrics…'
+    })
+  })
+
+  it('provides guidance without an action for an empty KPI slice', () => {
+    const state = withScenario(createInitialExperienceState(), 'empty')
+    const view = selectOverviewView(state)
+
+    expect(view.kpis).toEqual({
+      status: 'empty',
+      title: 'No metrics yet',
+      guidance: 'Metrics appear after simulated agent sessions run.'
+    })
+    expect(view.kpis).not.toHaveProperty('action')
+  })
+
+  it('provides a named cause and shared recovery for an error KPI slice', () => {
+    const state = withScenario(createInitialExperienceState(), 'error')
+    const view = selectOverviewView(state)
+
+    expect(view.kpis).toEqual({
+      status: 'error',
+      title: 'Key metrics could not be loaded',
+      cause: 'The simulated metrics source is unavailable.',
+      recovery: { id: 'recover-scenario', label: 'Try again' }
+    })
+  })
+
   it('returns a useful project-empty slice after skipping the first project', () => {
     const skipped = experienceReducer(createInitialExperienceState(), {
       type: 'skipOnboardingStep',
@@ -111,6 +146,53 @@ describe('scenario selectors', () => {
 
     expect(view.currentProject.status).toBe('empty')
     expect(view.sessions.status).toBe('ready')
+  })
+})
+
+describe('KPI view models', () => {
+  it('derives exactly 4 KPIs in the fixed order, from existing data plus the new success-rate field', () => {
+    const view = selectOverviewView(createInitialExperienceState())
+
+    if (view.kpis.status !== 'ready') {
+      throw new Error('expected the default-scenario kpis slice to be ready')
+    }
+    const kpis = view.kpis.data
+
+    expect(kpis.map((kpi) => kpi.id)).toEqual([
+      'active-agents',
+      'queue',
+      'success-rate',
+      'agent-time'
+    ])
+
+    const activeAgents = mockCatalog.sessions.filter((s) => s.status === 'Running').length
+    const queued = mockCatalog.issueQueue.length
+    const agentTime = mockCatalog.recentUsage.find((u) => u.label === 'Agent time')?.value
+
+    expect(kpis.find((kpi) => kpi.id === 'active-agents')?.value).toBe(String(activeAgents))
+    expect(kpis.find((kpi) => kpi.id === 'queue')?.value).toBe(String(queued))
+    expect(kpis.find((kpi) => kpi.id === 'agent-time')?.value).toBe(agentTime)
+    expect(kpis.find((kpi) => kpi.id === 'success-rate')?.value).toBe(
+      `${mockCatalog.kpis.successRate}%`
+    )
+  })
+
+  it('sizes every KPI series from the fixture, never a hardcoded point count', () => {
+    for (const series of Object.values(mockCatalog.kpis.series)) {
+      expect(series.length).toBeGreaterThanOrEqual(8)
+      expect(series.length).toBeLessThanOrEqual(12)
+    }
+  })
+
+  it('leaves mockCatalog.recentUsage unchanged by this feature (AC-017)', () => {
+    expect(mockCatalog.recentUsage).toEqual([
+      { label: 'Agent time', value: '3h 42m' },
+      { label: 'Sessions', value: '18' },
+      { label: 'Issues touched', value: '7' }
+    ])
+
+    const view = selectOverviewView(createInitialExperienceState())
+    expect(view.recentUsage.status).toBe('ready')
   })
 })
 
