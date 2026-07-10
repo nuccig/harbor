@@ -2,7 +2,7 @@
 
 ## Status Atual
 
-**Fase**: plan aprovado → handoff plan→tasks
+**Fase**: analyze PASS → handoff →implement
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
@@ -45,5 +45,9 @@
 2. Copy: grupo "Key metrics"; tiles "Active agents / Issue queue / Success rate / Agent time".
 3. Sparkline: `fill: var(--accent, var(--border))` + `fill-opacity: 0.75` (4.16/3.64/3.80:1); numeral `var(--ink)` sobre `var(--surface-raised)` (14.09/16.96/15.78:1) — reconfirmados pelo controller (scratchpad/contrast-check.js).
 4. Recharts ^3.9.2: `{ Bar, BarChart }` only, 48×16 fixo, margin zerado, `accessibilityLayer={false}`, `isAnimationActive={false}`, setup.ts intocado.
+
+| 6 Handoff plan→tasks | ✓ handoff-002.md (D-005..D-009, N4..N7) |
+| 7 Tasks | ✓ 3 tasks (001 dados ∥ 002 componente → 003 shell); scopes disjuntos validados pelo controller |
+| 8 Analyze | ✓ PASS 18/18 ACs, zero contradições bloqueantes; 3 gaps menores corrigidos pelo controller (covers AC-014 na 003, limpeza .dataList CSS na 003, vitest 2.1.9 no ADR-0002) |
 
 **Última atualização**: 2026-07-10 — controller (spec aprovada)

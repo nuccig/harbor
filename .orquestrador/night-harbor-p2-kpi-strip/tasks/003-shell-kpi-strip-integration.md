@@ -3,7 +3,7 @@ id: 003
 title: Shell integration — KPI strip replaces "Recent usage" in the utility slot
 status: pending
 depends_on: [001, 002]
-covers: [AC-001, AC-002, AC-018]
+covers: [AC-001, AC-002, AC-014, AC-018]
 ears_pattern: WHEN/THEN, AFTER/THEN
 created: 2026-07-10
 ---
@@ -84,7 +84,11 @@ skill-tool-governed one.
    is a small, deliberate deviation from the plan's literal "DataList intocado" phrasing — the
    plan did not anticipate that the swap leaves `DataList` fully unreferenced; removing
    orphaned dead code is the correct call, not a scope violation, since no other file/group
-   depends on it.)
+   depends on it.) Also remove the now-orphaned `.dataList` selector fragments in
+   `shell.module.css` (combined via comma with `.projectSummary` in ~4 blocks around lines
+   120–146): drop only the `.dataList`-related selector parts (and any `.dataList`-only rules),
+   keeping the `.projectSummary` styling identical — analyze-agent finding #2, same dead-code
+   rationale as the JS helper.
 4. Add `.kpiStrip` to `shell.module.css` (nested layout *inside* the utility slot — it does not
    replace the slot's own per-concept grid-column span):
 

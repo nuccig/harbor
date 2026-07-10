@@ -24,7 +24,7 @@ G3 (locked, not reopened) approved Recharts as a new dependency for a static bar
    decorative, matching the "Out: nenhuma interatividade" non-goal and AC-006/AC-016.
 
 These are engineering facts, not taste calls, so they were verified empirically (isolated
-scratchpad probe: `recharts@3.9.2` + `react@18.3.1` + `vitest@2.1.8` + `jsdom@29.1.1` +
+scratchpad probe: `recharts@3.9.2` + `react@18.3.1` + `vitest@2.1.9` + `jsdom@29.1.1` +
 `@testing-library/react@16.3.2`, matching this repo's exact toolchain versions) rather than
 inferred from documentation alone.
 
