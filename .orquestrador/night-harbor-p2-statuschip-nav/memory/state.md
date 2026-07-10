@@ -42,8 +42,15 @@
 | 7 Tasks | ✓ 3 tasks serial 001→002→003 (commit a33e641) |
 | 8 Analyze | ✓ PASS 10/10 ACs, zero contradições |
 | 9 Handoff →implement | ✓ handoff-003.md |
-| 10 Implement | em andamento (serial: 001 → 002 → 003) |
-| 11+ | pendente |
+| 10 Implement | ✓ 001 (70d77ce) → 002 (e4b2487) → 003 (58cbcd0); gate 164/164 |
+| 11 Handoff →review | ✓ handoff-004.md |
+| 12 Verify | ✓ lint/typecheck/test verdes (controller); openwiki n/a |
+| 13 Review | ✓ round 001: 0 Critical/High, 2 Medium (teste) |
+| 14 Handoff →fix | ✓ handoff-005.md |
+| 15 Fix | ✓ 101+201 resolvidos (a2d888a) |
+| 16 Verify | ✓ 164/164 (controller) |
+| 17 Re-review | em andamento |
+| 18+ | pendente |
 
 ## Decisões do gate do plan (vinculantes, incorporadas na rev. 2)
 

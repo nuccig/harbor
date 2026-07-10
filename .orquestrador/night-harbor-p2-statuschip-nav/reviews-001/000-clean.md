@@ -4,7 +4,7 @@
 **Feature**: night-harbor-p2-statuschip-nav  
 **Review Phase**: SDD review (post-implement)  
 
-## Status: PASS (with minor Medium findings)
+## Status: PASS — round clean (2 Medium findings RESOLVED via fix commit a2d888a)
 
 ### Summary by Dimension
 
@@ -12,18 +12,26 @@
 |-----------|--------|----------|----------|
 | Security | ✓ PASS | 0 issues | — |
 | Requirements & DoD (AC-1 to AC-10) | ✓ PASS | 0 violations | — |
-| Architecture & Conventions | ⏳ Pending | — | — |
-| Test Coverage | ✓ PASS | 2 Medium (brittle assertions, missing tone classes) | No |
-| Regression & Hallucination | ✓ PASS | 1 Medium (brittle hardcoded count) | No |
+| Architecture & Conventions | ✓ PASS | 0 violations (9/9 hard rules) | — |
+| Test Coverage | ✓ PASS | 2 Medium (brittle assertions, missing tone classes) — RESOLVED | No |
+| Regression & Hallucination | ✓ PASS | 1 Medium (brittle hardcoded count) — RESOLVED | No |
 
 ### Detailed Findings
 
 **Critical/High Findings**: 0  
-**Medium Findings**: 2
-- 101: Brittle hardcoded agent count in test assertion (shell-settings.test.tsx:362)
-- 201: Missing tone class assertions in integration tests (shell-settings.test.tsx:305–387)
+**Medium Findings**: 2 — **both RESOLVED** (fix commit a2d888a, re-checked 2026-07-09)
+- 101: Brittle hardcoded agent count in test assertion (shell-settings.test.tsx:362) — RESOLVED: count derived from mockCatalog.agents.filter
+- 201: Missing tone class assertions in integration tests (shell-settings.test.tsx:305–387) — RESOLVED: expectStatusChip helper + tone class asserts on sessions/agents/integrations
 
 **Low Findings**: 0
+
+### Fix Re-check (step 17)
+
+Commit a2d888a touches only tests/renderer/shell-settings/shell-settings.test.tsx (+40/-4):
+- No existing assertions loosened: text-presence asserts retained (getByText throws on absence); length assert retained (now derived, not removed)
+- Tone class checks are CSS-module safe: `closest('[class*="statusChip"]')` + `className.toContain('statusChip_<tone>')` — statusLabel span does not match the statusChip substring, so closest resolves to the chip wrapper
+- Verify gate fresh: lint ✓, typecheck ✓, 164/164 ✓
+- Zero source files touched (test-only fix)
 
 ### Acceptance Criteria (AC-1 to AC-10)
 
