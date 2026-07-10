@@ -2,7 +2,9 @@
 
 ## Status Atual
 
-**Fase**: consolidate + brain-sync ✓ → PR
+**Fase**: `done` (run encerrada)
+**Saída**: PR #6 (ready) `feat/night-harbor-p2-kpi-strip` → `feat/night-harbor-p2-statuschip-nav` (stacked sobre PR #5; cadeia #2 ← #4 ← #5 ← #6)
+**Próximo lote**: P2.4 (ações inline nos cards de sessão) — depois P2.5/P2.6 da proposta
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
