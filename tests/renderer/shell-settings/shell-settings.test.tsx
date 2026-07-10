@@ -11,6 +11,7 @@ import type {
   SettingsCategory,
   ShellDestination
 } from '../../../src/renderer/src/app/experience-model'
+import { mockCatalog } from '../../../src/renderer/src/app/mock-catalog'
 import { Settings } from '../../../src/renderer/src/settings'
 import { Shell } from '../../../src/renderer/src/shell'
 import { Button, ToastRegion } from '../../../src/renderer/src/ui'
@@ -48,6 +49,15 @@ function OnboardingCompletionHarness() {
   }
 
   return <Shell />
+}
+
+function expectStatusChip(
+  label: string,
+  expectedTone: 'success' | 'warning' | 'danger' | 'neutral'
+) {
+  const chip = screen.getByText(label).closest('[class*="statusChip"]')
+  expect(chip).toBeTruthy()
+  expect(chip?.className).toContain(`statusChip_${expectedTone}`)
 }
 
 const destinations: readonly [ShellDestination, string, string][] = [
@@ -317,6 +327,11 @@ describe('Shell and settings', () => {
     expect(screen.getByText('Running')).toBeInTheDocument()
     expect(screen.getByText('Ready')).toBeInTheDocument()
     expect(screen.getByText('Complete')).toBeInTheDocument()
+
+    // Verify CSS tone classes are applied
+    expectStatusChip('Running', 'success')
+    expectStatusChip('Ready', 'warning')
+    expectStatusChip('Complete', 'neutral')
   })
 
   it('renders nav labels always visible (never icon-only)', async () => {
@@ -358,8 +373,20 @@ describe('Shell and settings', () => {
     // Verify that agents status is rendered via StatusChip
     const agentsSection = screen.getByLabelText('Available agents')
     expect(agentsSection).toBeInTheDocument()
-    // Verify StatusChip labels are present (at least one)
-    expect(within(agentsSection).getAllByText('Available')).toHaveLength(3)
+
+    // Derive expected count from mockCatalog (Fix 101: avoid brittle hardcoded count)
+    const availableAgentsCount = mockCatalog.agents.filter(
+      (agent) => agent.status === 'Available'
+    ).length
+    const availableElements = within(agentsSection).getAllByText('Available')
+    expect(availableElements).toHaveLength(availableAgentsCount)
+
+    // Verify CSS tone classes are applied to all Available agent chips (Fix 201)
+    availableElements.forEach((element) => {
+      const chip = element.closest('[class*="statusChip"]')
+      expect(chip).toBeTruthy()
+      expect(chip?.className).toContain('statusChip_success')
+    })
   })
 
   it('renders StatusChip in integrations list (Not configured → warning, Simulated → neutral)', async () => {
@@ -382,7 +409,16 @@ describe('Shell and settings', () => {
     // Verify that integrations status is rendered via StatusChip
     const integrationsSection = screen.getByLabelText('Issue integrations')
     expect(integrationsSection).toBeInTheDocument()
-    expect(within(integrationsSection).getByText('Not configured')).toBeInTheDocument()
-    expect(within(integrationsSection).getByText('Simulated')).toBeInTheDocument()
+
+    // Verify tone class assertions (Fix 201: CSS tone mapping)
+    const notConfiguredElement = within(integrationsSection).getByText('Not configured')
+    const notConfiguredChip = notConfiguredElement.closest('[class*="statusChip"]')
+    expect(notConfiguredChip).toBeTruthy()
+    expect(notConfiguredChip?.className).toContain('statusChip_warning')
+
+    const simulatedElement = within(integrationsSection).getByText('Simulated')
+    const simulatedChip = simulatedElement.closest('[class*="statusChip"]')
+    expect(simulatedChip).toBeTruthy()
+    expect(simulatedChip?.className).toContain('statusChip_neutral')
   })
 })
