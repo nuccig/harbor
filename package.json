@@ -26,6 +26,7 @@
     "node-pty": "^1.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "recharts": "^3.9.2",
     "shaders": "^2.5.135"
   },
   "devDependencies": {
