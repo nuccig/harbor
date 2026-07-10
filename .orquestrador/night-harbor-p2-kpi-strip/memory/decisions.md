@@ -153,13 +153,48 @@ aceito/divulgado (R5), não mitigado nesta feature.
 
 ---
 
+## Decisões Aprovadas (tasks + analyze, 2026-07-10)
+
+### D-010: Task 002 é Dona Única de `package.json`/`package-lock.json`
+
+**Status**: APROVADO (tasks-agent, fecha o item "ABERTO p/ tasks-agent" que handoff-002.md havia
+deixado pendente na tabela de riscos)
+**Descrição**: A instalação do Recharts (`npm install recharts@^3.9.2`) e seu efeito colateral no
+lockfile pertencem exclusivamente à task 002 ("Componente") — não à task 001 ("Dados"). Critério:
+só `MetricTile.tsx` importa `recharts` diretamente; `Shell.tsx`/`selectors.ts`/`mock-catalog.ts`
+só recebem `series: number[]` por props, nunca tocam a lib. Isso alinha "quem introduz a
+dependência" com "quem a importa de fato" e mantém a task de Dados livre de qualquer efeito
+colateral de instalação.
+**Referência**: handoff-002.md "Instalação do Recharts"; tasks/002-metrictile-component.md File
+scope + Step 1.
+
+---
+
+### D-011: Remoção de `DataList` e Seletores `.dataList` Órfãos (Achado do Analyze)
+
+**Status**: APROVADO (analyze-agent, incorporado à task 003 pelo controller)
+**Descrição**: A troca do slot `utility` (recentUsage → KPI strip) deixa o helper `DataList`
+(`Shell.tsx` ~linha 83) e os seletores `.dataList` combinados via vírgula com `.projectSummary`
+em `shell.module.css` (~linhas 120–146) sem nenhum call site/uso — confirmado por busca (1 call
+site antes da troca, 0 depois). Remover ambos é limpeza de dead code segura, não uma mudança de
+escopo: nenhum dos outros 4 grupos do Overview usa `DataList`, e `.projectSummary` deve manter a
+estilização idêntica após a remoção do fragmento `.dataList`.
+**Referência**: tasks/003-shell-kpi-strip-integration.md Step 3; report_anterior do dispatch
+(achado #2 do analyze).
+
+---
+
 ## Rastreabilidade
 
 - **Aprovação spec**: spec.md status header (HITL 2026-07-10, sem alterações solicitadas)
 - **Aprovação plan**: plan.md status header (gate HITL 2026-07-10, trade-off AC-014 = A)
 - **Origem das decisões**: grill HITL G1–G4 (state.md linhas 13–21); gate do plan (state.md
-  "Decisões do gate do plan", 4 itens)
+  "Decisões do gate do plan", 4 itens); tasks-agent + analyze-agent (D-010, D-011)
 - **Boundary de verificação**: constitution.md `test_expectations` + `boundaries.always` (auditoria
   numérica de contraste obrigatória para qualquer par de cor novo, sparkline inclusa)
+- **Analyze**: PASS, 18/18 ACs cobertos, zero contradições bloqueantes; 3 gaps menores corrigidos
+  diretamente nos artefatos das tasks (covers AC-014 em 003; limpeza `.dataList` em 003; vitest
+  citado em ADR-0002 corrigido para 2.1.9) — ver memory/handoff-003.md para o detalhe completo.
 
-**Próxima atualização**: sdd-tasks (particionamento em tasks com disjoint file scopes).
+**Próxima atualização**: sdd-implement (execução 001∥002→003); qualquer decisão nova de
+implementação (ex.: desvio técnico descoberto ao rodar `npm install`) deve ser registrada aqui.

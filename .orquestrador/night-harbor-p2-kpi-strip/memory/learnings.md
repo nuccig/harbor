@@ -179,6 +179,75 @@ PRECISA".
 
 ---
 
+## Descobertas Desta Run (handoff tasks+analyze→implement, 2026-07-10)
+
+### N8: Paralelização Dados×Componente (N7) Foi Confirmada no Particionamento Real
+
+**Contexto**: sdd-tasks efetivamente particionou 001 (Dados) e 002 (Componente) com
+`depends_on: []` em ambas — a previsão de N7 (componente `ui/` type-isolado dos dados habilita
+paralelização) virou execução real, não só uma possibilidade teórica. `003` (Integração Shell) é
+a única com `depends_on: [001, 002]`, serial genuína (dependência de compilação, não estilo).
+
+**Implicação**: confirma que o padrão "componente `ui/` recebe props prontas, nunca importa
+`selectors.ts`/`mock-catalog.ts`" é reaproveitável como heurística de particionamento de tasks em
+features futuras com a mesma arquitetura de camadas.
+
+**Referência**: tasks/001-kpi-data-model.md, tasks/002-metrictile-component.md (frontmatter
+`depends_on: []` em ambas); tasks/003-shell-kpi-strip-integration.md (`depends_on: [001, 002]`).
+
+---
+
+### N9: Acoplamento de Dado (não de arquivo) Entre Tasks Paralelas Precisa de Verify Gate Conjunto
+
+**Contexto**: `tests/renderer/ui/metric-tile.test.tsx` (task 002) importa `mockCatalog`
+diretamente só para ler `mockCatalog.kpis.series` (contagens fixture-driven) — campo que só
+existe depois que a task 001 adicionar o bloco `kpis`. Scopes de arquivo são disjuntos (zero
+overlap), mas há uma dependência de **dado/símbolo** entre as duas tasks paralelas.
+
+**Implicação**: quando duas tasks paralelas compartilham esse tipo de acoplamento, o verify gate
+não deve ser declarado PASS isoladamente por task — precisa rodar uma vez contra a árvore
+combinada (ambas as tasks já aplicadas) antes de qualquer uma ser assinada como concluída. Ambas
+as tasks já documentam isso explicitamente na própria seção "Context"/"Validation criteria".
+
+**Referência**: tasks/002-metrictile-component.md "Known cross-task data coupling"; tasks/001
+"Downstream consumer heads-up"; memory/handoff-003.md "Sumário Executivo" item 2.
+
+---
+
+### N10: Colisão de Texto Entre Heading de Grupo Pré-existente e Label de Tile Novo
+
+**Contexto**: o achado do analyze-agent identificou que o heading `<h2>Issue queue</h2>` (grupo
+`slot="queue"`, pré-existente, intocado) e o label do novo `MetricTile` "Issue queue" (um dos 4
+KPIs) são o mesmo texto literal — uma query `getByText('Issue queue')` sem escopo casaria os
+dois elementos e lançaria erro de múltiplos matches.
+
+**Implicação**: sempre que uma feature reintroduzir um rótulo textual que já existe em outro
+elemento estrutural da mesma tela (heading de grupo vs. label de item, por exemplo), os testes
+novos devem usar `within(...)` escopado ao container correto (ou `getByRole` com `name` mais
+específico) em vez de `getByText` cru — heurística reaproveitável para qualquer feature futura
+que adicione KPIs/labels que ecoem nomenclatura de grupos já existentes na tela.
+
+**Referência**: tasks/003-shell-kpi-strip-integration.md "Naming-collision gotcha"; dispatch
+report_anterior do controller.
+
+---
+
+### N11: Dead Code Só Fica Órfão Depois da Troca — Remoção Cabe na Mesma Task que Troca o Slot
+
+**Contexto**: `DataList` (helper JS) e os fragmentos de seletor `.dataList` (CSS, combinados via
+vírgula com `.projectSummary`) só viram dead code **depois** que a task 003 substitui o
+`renderReady` do slot `utility`. Antes da troca, `DataList` tinha exatamente 1 call site (o
+próprio `renderReady` sendo substituído) — confirmado por busca, não suposição.
+
+**Implicação**: quando uma task de integração troca o único consumidor de um helper/seletor
+compartilhado, a remoção do dead code resultante pertence à mesma task (não a uma task de
+limpeza separada), desde que a busca confirme que não há outro consumidor no arquivo — heurística
+já aplicada aqui pelo analyze-agent e incorporada ao texto da task 003 pelo controller.
+
+**Referência**: tasks/003-shell-kpi-strip-integration.md Step 3; memory/decisions.md D-011.
+
+---
+
 ## Rastreabilidade
 
 - **Learnings herdados**: atlas + `.orquestrador/night-harbor-p2-statuschip-nav/memory/learnings.md`
@@ -187,6 +256,10 @@ PRECISA".
 - **N4–N7**: descobertas do handoff-agent na fase plan→tasks, 2026-07-10 (N4–N6 herdadas dos
   probes empíricos do plan-agent nos ADRs, formalizadas aqui como learnings reaproveitáveis;
   N7 é descoberta própria desta fase de handoff).
-- **Próxima atualização**: sdd-tasks deve confirmar se o particionamento em tasks respeitou a
-  paralelização Dados×Componente (N7) e registrar qualquer learning novo sobre o processo de
-  `npm install` do Recharts dentro do scope disjunto escolhido.
+- **N8–N11**: descobertas do handoff-agent na fase tasks+analyze→implement, 2026-07-10 (N8 e N9
+  confirmam previsões anteriores contra o particionamento real; N10 e N11 formalizam achados do
+  analyze-agent já incorporados às tasks pelo controller, tornando-os reaproveitáveis fora desta
+  feature).
+- **Próxima atualização**: sdd-implement deve confirmar que o verify gate conjunto (001+002) foi
+  de fato executado antes de 003 iniciar, e registrar qualquer learning novo sobre o comportamento
+  real do `npm install recharts` (versões instaladas de fato, efeitos colaterais no lockfile).
