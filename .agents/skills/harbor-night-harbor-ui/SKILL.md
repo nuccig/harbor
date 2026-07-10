@@ -70,6 +70,25 @@ desktop-only filters that govern all UI work. Decision source:
 - **Dual-gate viewport behavior**: gate viewport-conditional behavior in **BOTH** CSS
   `@media` **AND** JS `matchMedia` at the same breakpoint, JS short-circuits. (atlas learning:
   `css-js-dual-gate-provable-non-regression`)
+- **StatusChip (P2)**: status chips live in `src/renderer/src/ui/StatusChip.tsx`. Tinted
+  background `color-mix(in srgb, var(--tone), transparent 85%)`; text/icon/dot in the **token
+  color itself** (`--success`/`--warning`/`--danger`; neutral → `--ink-muted`) — never `on-*`
+  over tinted fills (reinforces L-001: `on-*` presumes the solid token as background). Solid
+  fallback `var(--surface-raised)` outside the `@supports` block — never color-mix in the
+  fallback. Default icons by tone: CheckCircle/Clock/Warning/Minus (Phosphor Regular). Audited
+  ratios: 6.08–8.48:1 tinted, 6.88–10.49:1 fallback (ADR-0014).
+- **Nav ícone+label (P2)**: primary nav uses Phosphor Regular via `SemanticIcon decorative` +
+  label **always visible** (truncate with ellipsis, never hide). navIcons: Compass (overview),
+  FolderOpen (projects), Boat (sessions — harbor metaphor), Tray (issues), GearSix (settings).
+  Active pill on `[aria-current='page']`: `--surface-active` background + `--accent` border.
+
+## Testing (renderer components)
+
+- CSS module class names are hashed at build time — assert by substring, never literal:
+  `element.closest('[class*="statusChip"]')` + `expect(el?.className).toContain('statusChip_<tone>')`.
+- Counts/values asserted in tests must be derived from the fixture source
+  (`mockCatalog.agents.filter(...).length`), never hardcoded literals. (atlas learning:
+  `css-module-class-asserts-substring-and-fixture-derived`)
 
 ## Anti-patterns (never)
 
@@ -90,6 +109,11 @@ desktop-only filters that govern all UI work. Decision source:
 - **Never** pair `on-*` tokens as text over non-token surfaces — `on-*` is text color OVER the token-color
   as background, not over arbitrary surfaces. Use text tokens (`--ink`, `--ink-muted`) for non-status
   surfaces (L-001).
+- **Never** use `on-*` as text over a tinted/translucent background — `on-*` presupposes the
+  **solid** token as background; over color-mix tints, use the token color itself
+  (`on-success` over 85% tint = 1.50:1, fails AA — ADR-0014).
+- **Never** assert CSS module classes with literal `toHaveClass` — hashed class names break it;
+  use substring matching (`[class*="..."]` + `className.toContain`).
 
 ## References
 
@@ -99,5 +123,5 @@ desktop-only filters that govern all UI work. Decision source:
 - `styles/global.css`, `design-lab/DesignLab.tsx`
 - Atlas: `nucci-0016-ambient-layer`, `gpu-fallback-detect-values-not-keys`,
   `navbar-contrast-color-mix-over-ambient`, `css-js-dual-gate-provable-non-regression`
-- ADRs 0001–0013 (`docs/adr/`)
+- ADRs 0001–0014 (`docs/adr/`)
 - ui-ux-pro-max skill (design system search baseline)

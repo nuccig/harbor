@@ -222,6 +222,74 @@
   }
 }
 
+/* StatusChip — novo componente, P2.1 */
+
+.statusChip {
+  align-items: center;
+  /* Fallback sólido para navegadores sem color-mix.
+     Nunca color-mix no fallback — bug da rev. 1. */
+  background: var(--surface-raised);
+  border: 1px solid var(--chipTone, var(--border));
+  border-radius: var(--radius-control);
+  color: var(--chipText, var(--ink-muted));
+  display: inline-flex;
+  font-size: var(--type-small);
+  font-weight: var(--weight-label);
+  gap: var(--space-2);
+  padding-block: var(--space-1);
+  padding-inline: var(--space-3);
+}
+
+/* Fundo tintado dinâmico — color-mix 85% conforme spec e gate HITL.
+   Texto/dot/ícone na cor do token (não on-*); ratios auditados 6.08–8.48:1. */
+@supports (color: color-mix(in srgb, black, transparent)) {
+  .statusChip {
+    background: color-mix(in srgb, var(--chipTone, var(--border)), transparent 85%);
+  }
+}
+
+/* Tone variants — custom properties definem tema por tone.
+   Cadeia var() degrada para neutro legível sob conceitos legados. */
+.statusChip_success {
+  --chipTone: var(--success, var(--border));
+  --chipText: var(--success, var(--ink-muted));
+}
+
+.statusChip_warning {
+  --chipTone: var(--warning, var(--border));
+  --chipText: var(--warning, var(--ink-muted));
+}
+
+.statusChip_danger {
+  --chipTone: var(--danger, var(--border));
+  --chipText: var(--danger, var(--ink-muted));
+}
+
+.statusChip_neutral {
+  --chipTone: var(--border);
+  --chipText: var(--ink-muted);
+}
+
+/* Sub-elementos decorativos */
+.statusDot {
+  background: currentColor;  /* dot herda cor do texto (cor do token) */
+  block-size: 0.5rem;
+  border-radius: 50%;
+  flex: none;
+  inline-size: 0.5rem;
+}
+
+.statusIcon {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+  /* SVG Phosphor herda currentColor do parent */
+}
+
+.statusLabel {
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .button,
   .skeleton,

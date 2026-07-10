@@ -11,6 +11,7 @@ import type {
   SettingsCategory,
   ShellDestination
 } from '../../../src/renderer/src/app/experience-model'
+import { mockCatalog } from '../../../src/renderer/src/app/mock-catalog'
 import { Settings } from '../../../src/renderer/src/settings'
 import { Shell } from '../../../src/renderer/src/shell'
 import { Button, ToastRegion } from '../../../src/renderer/src/ui'
@@ -48,6 +49,15 @@ function OnboardingCompletionHarness() {
   }
 
   return <Shell />
+}
+
+function expectStatusChip(
+  label: string,
+  expectedTone: 'success' | 'warning' | 'danger' | 'neutral'
+) {
+  const chip = screen.getByText(label).closest('[class*="statusChip"]')
+  expect(chip).toBeTruthy()
+  expect(chip?.className).toContain(`statusChip_${expectedTone}`)
 }
 
 const destinations: readonly [ShellDestination, string, string][] = [
@@ -300,5 +310,115 @@ describe('Shell and settings', () => {
     expect(screen.getByRole('combobox', { name: 'Default agent' })).toHaveValue(
       'gemini-cli'
     )
+  })
+
+  it('renders StatusChip components for session status in Overview', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <OnboardingCompletionHarness />
+      </ExperienceTestRoot>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Complete onboarding' }))
+
+    // Verify that session status values are rendered (StatusChip displays them as labels)
+    expect(screen.getByText('Running')).toBeInTheDocument()
+    expect(screen.getByText('Ready')).toBeInTheDocument()
+    expect(screen.getByText('Complete')).toBeInTheDocument()
+
+    // Verify CSS tone classes are applied
+    expectStatusChip('Running', 'success')
+    expectStatusChip('Ready', 'warning')
+    expectStatusChip('Complete', 'neutral')
+  })
+
+  it('renders nav labels always visible (never icon-only)', async () => {
+    render(
+      <ExperienceTestRoot>
+        <Shell />
+      </ExperienceTestRoot>
+    )
+
+    const primaryNavigation = screen.getByRole('navigation', {
+      name: 'Primary navigation'
+    })
+
+    // Verify all destination labels are present as text content within buttons
+    expect(within(primaryNavigation).getByText('Overview')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Projects')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Sessions')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Issues')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Settings')).toBeInTheDocument()
+  })
+
+  it('renders StatusChip in agents list (Available → success)', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <Settings />
+      </ExperienceTestRoot>
+    )
+
+    // Navigate to Agents category
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Settings categories' })).getByRole(
+        'button',
+        { name: 'Agents' }
+      )
+    )
+
+    // Verify that agents status is rendered via StatusChip
+    const agentsSection = screen.getByLabelText('Available agents')
+    expect(agentsSection).toBeInTheDocument()
+
+    // Derive expected count from mockCatalog (Fix 101: avoid brittle hardcoded count)
+    const availableAgentsCount = mockCatalog.agents.filter(
+      (agent) => agent.status === 'Available'
+    ).length
+    const availableElements = within(agentsSection).getAllByText('Available')
+    expect(availableElements).toHaveLength(availableAgentsCount)
+
+    // Verify CSS tone classes are applied to all Available agent chips (Fix 201)
+    availableElements.forEach((element) => {
+      const chip = element.closest('[class*="statusChip"]')
+      expect(chip).toBeTruthy()
+      expect(chip?.className).toContain('statusChip_success')
+    })
+  })
+
+  it('renders StatusChip in integrations list (Not configured → warning, Simulated → neutral)', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <Settings />
+      </ExperienceTestRoot>
+    )
+
+    // Navigate to Integrations category
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Settings categories' })).getByRole(
+        'button',
+        { name: 'Integrations' }
+      )
+    )
+
+    // Verify that integrations status is rendered via StatusChip
+    const integrationsSection = screen.getByLabelText('Issue integrations')
+    expect(integrationsSection).toBeInTheDocument()
+
+    // Verify tone class assertions (Fix 201: CSS tone mapping)
+    const notConfiguredElement = within(integrationsSection).getByText('Not configured')
+    const notConfiguredChip = notConfiguredElement.closest('[class*="statusChip"]')
+    expect(notConfiguredChip).toBeTruthy()
+    expect(notConfiguredChip?.className).toContain('statusChip_warning')
+
+    const simulatedElement = within(integrationsSection).getByText('Simulated')
+    const simulatedChip = simulatedElement.closest('[class*="statusChip"]')
+    expect(simulatedChip).toBeTruthy()
+    expect(simulatedChip?.className).toContain('statusChip_neutral')
   })
 })
