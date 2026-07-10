@@ -38,8 +38,12 @@
 | 3 Spec | ✓ aprovada HITL, commit 41f0183 |
 | 4 Handoff spec→plan | ✓ handoff-001.md |
 | 5 Plan | ✓ aprovado HITL + correção de contraste aplicada (rev. 2) |
-| 6 Handoff plan→tasks | em andamento |
-| 7+ | pendente |
+| 6 Handoff plan→tasks | ✓ handoff-002.md |
+| 7 Tasks | ✓ 3 tasks serial 001→002→003 (commit a33e641) |
+| 8 Analyze | ✓ PASS 10/10 ACs, zero contradições |
+| 9 Handoff →implement | ✓ handoff-003.md |
+| 10 Implement | em andamento (serial: 001 → 002 → 003) |
+| 11+ | pendente |
 
 ## Decisões do gate do plan (vinculantes, incorporadas na rev. 2)
 
