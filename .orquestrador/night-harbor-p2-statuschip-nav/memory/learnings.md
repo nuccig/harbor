@@ -182,17 +182,36 @@ mou decisões design (mapeamento semântico, color-mix fallback, motion ternári
 - **L6–L8 origem**: Plan gate analysis + ADR-0001 + contrast-audit.md (plan, 2026-07-09)
 - **Próxima atualização**: sdd-tasks (task breakdown), sdd-implement (CSS conformance), sdd-verify (audit re-validate se cores mudarem)
 
+### L9: Icon Sizing Default Behavior (Phosphor Regular)
+
+**Contexto**: Implement execution
+**Descrição**: Nav ícones implementados usando tamanho default 1em Phosphor; spec sugeria customização via `var(--icon-md)`.
+
+**Implementação**: StatusChip defaults (CheckCircle/Clock/Warning/Minus), nav icons (Compass/FolderOpen/Boat/Tray/GearSix) todos com `weight="regular"` explícito, size default 1em.
+
+**Implicação**:
+1. Ícones funcionalmente acessíveis (aria-hidden OK, labels visíveis)
+2. Tamanho visual pode variar conforme contexto (1em = relativo ao font-size do container)
+3. Se customização for necessária (AC-7 falhar visualmente), adicionar `size="var(--icon-md)"` em future iteration (não bloqueia atual)
+
+**Aprendizado**: Phosphor defaults são seguros e portáveis; customização de tamanho é nice-to-have, não deve-ter.
+
+**Referência**: report_anterior (desvio menor: ícone nav 1em), handoff-004.md R1
+
+---
+
 ## Status das Learnings na Run P2 — Consolidado
 
-| # | Learning | Criticidade | Adotado Spec? | Status Plan | Status Tasks |
-|---|----------|-------------|---------------|-------------|-----------|
-| L1 | On-token semantics | ALTA | Sim (AC-10) | Validado + reforçado (L8) | Confiar em ADR-0001; testable |
-| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Cumprido: auditoria manual exata | Re-validate se hex mudar |
-| L3 | Navbar color-mix technique | ALTA | Sim (§5.2) | Implementado: fallback @supports | Verificar CSS corretude |
-| L4 | Motion reduced-motion ternário | ALTA | Parcial | N/A (P2.1+P2.2 sem motion) | Re-aplicar em P3+ se motion |
-| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1) | Resolvido: ratios exatos (7.10–8.48) | Confiar em contrast-audit.md |
-| L6 | Audit luminâncias exatas | CRÍTICA | N/A | Aplicado: rev. 2 corrigiu rev. 1 | N/A (audit já feita) |
-| L7 | Retry session limit | MÉDIA | N/A | Ocorreu + resolvido | Monitora |
-| L8 | On-token fill sólido | ALTA | Novo | Validado: reservados para D-007 | Documentado em ADR-0001 |
-| P1 | Gate confirmation aberto | MÉDIA | Sim | Aplicado: 6 decisões do gate | Continuar pattern |
-| P2 | Brain recall alignment | ALTA | Sim | Cumprido | Continuar antes de plan |
+| # | Learning | Criticidade | Adotado Spec? | Status Plan | Status Tasks | Status Implement |
+|---|----------|-------------|---------------|-------------|-----------|-------------|
+| L1 | On-token semantics | ALTA | Sim (AC-10) | Validado + reforçado (L8) | Confiar em ADR-0001; testable | Implementado conforme |
+| L2 | Gate blind to contrast | CRÍTICA | Sim (AC-10, boundary) | Cumprido: auditoria manual exata | Re-validate se hex mudar | Hex confirmado var(), nenhuma mudança |
+| L3 | Navbar color-mix technique | ALTA | Sim (§5.2) | Implementado: fallback @supports | Verificar CSS corretude | CSS auditado ✓ (fallback + @supports) |
+| L4 | Motion reduced-motion ternário | ALTA | Parcial | N/A (P2.1+P2.2 sem motion) | Re-aplicar em P3+ se motion | Nenhuma motion nova (OK) |
+| L5 | Color-mix contraste cego | CRÍTICA | Sim (§6.1) | Resolvido: ratios exatos (7.10–8.48) | Confiar em contrast-audit.md | Ratios do plan não mudaram |
+| L6 | Audit luminâncias exatas | CRÍTICA | N/A | Aplicado: rev. 2 corrigiu rev. 1 | N/A (audit já feita) | N/A (audit no plan) |
+| L7 | Retry session limit | MÉDIA | N/A | Ocorreu + resolvido | Monitora | N/A |
+| L8 | On-token fill sólido | ALTA | Novo | Validado: reservados para D-007 | Documentado em ADR-0001 | Implementado: on-* zero em StatusChip |
+| L9 | Icon sizing default 1em | MÉDIA | Novo | N/A | N/A | Implementado; customização future OK |
+| P1 | Gate confirmation aberto | MÉDIA | Sim | Aplicado: 6 decisões do gate | Continuar pattern | N/A |
+| P2 | Brain recall alignment | ALTA | Sim | Cumprido | Continuar antes de plan | N/A |
