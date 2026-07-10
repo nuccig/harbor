@@ -28,6 +28,10 @@ function freezeItems<T extends object>(items: T[]): readonly Readonly<T>[] {
   return Object.freeze(items.map((item) => Object.freeze(item)))
 }
 
+function freezeArray<T>(items: T[]): readonly T[] {
+  return Object.freeze([...items])
+}
+
 const concepts: Readonly<Record<ConceptId, { label: string; shortLabel: string }>> =
   Object.freeze({
     'command-deck': Object.freeze({ label: 'Command Deck', shortLabel: 'Deck' }),
@@ -129,7 +133,16 @@ export const mockCatalog = Object.freeze({
   integrations: freezeItems([
     { id: 'github', label: 'GitHub Issues', status: 'Simulated' },
     { id: 'linear', label: 'Linear', status: 'Not configured' }
-  ])
+  ]),
+  kpis: Object.freeze({
+    successRate: 92,
+    series: Object.freeze({
+      'active-agents': freezeArray([1, 2, 2, 1, 2, 3, 2, 1, 2, 1]),
+      queue: freezeArray([2, 3, 4, 3, 2, 3, 4, 3, 2, 3]),
+      'success-rate': freezeArray([88, 90, 89, 91, 93, 90, 94, 92, 95, 92]),
+      'agent-time': freezeArray([2.6, 2.8, 3.0, 3.1, 2.9, 3.3, 3.5, 3.4, 3.6, 3.42])
+    })
+  })
 })
 
 export type MockCatalog = typeof mockCatalog

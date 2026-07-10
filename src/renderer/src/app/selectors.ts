@@ -6,6 +6,7 @@ import {
 } from './experience-model'
 import {
   mockCatalog,
+  type MockCatalog,
   type ScenarioSlice,
   type SharedAction
 } from './mock-catalog'
@@ -77,6 +78,57 @@ export function selectOnboardingView(state: ExperienceState): OnboardingViewMode
   }
 }
 
+export interface KpiViewModel {
+  id: 'active-agents' | 'queue' | 'success-rate' | 'agent-time'
+  label: string
+  value: string
+  series: readonly number[]
+}
+
+// Single source of truth for "what counts as active" — shared with Shell.tsx's
+// mapSessionStatusToTone so the two call sites can't drift apart (review 003).
+export function isSessionActive(status: string): boolean {
+  return status === 'Running'
+}
+
+// Extracted so the '—' fallback branch is directly testable without depending on
+// mockCatalog's frozen singleton shape (review 004).
+export function resolveAgentTime(recentUsage: MockCatalog['recentUsage']): string {
+  return recentUsage.find((u) => u.label === 'Agent time')?.value ?? '—'
+}
+
+function buildKpiViewModels(): readonly KpiViewModel[] {
+  const activeAgents = mockCatalog.sessions.filter((s) => isSessionActive(s.status)).length
+  const queued = mockCatalog.issueQueue.length
+  const agentTime = resolveAgentTime(mockCatalog.recentUsage)
+  return [
+    {
+      id: 'active-agents',
+      label: 'Active agents',
+      value: String(activeAgents),
+      series: mockCatalog.kpis.series['active-agents']
+    },
+    {
+      id: 'queue',
+      label: 'Issue queue',
+      value: String(queued),
+      series: mockCatalog.kpis.series.queue
+    },
+    {
+      id: 'success-rate',
+      label: 'Success rate',
+      value: `${mockCatalog.kpis.successRate}%`,
+      series: mockCatalog.kpis.series['success-rate']
+    },
+    {
+      id: 'agent-time',
+      label: 'Agent time',
+      value: agentTime,
+      series: mockCatalog.kpis.series['agent-time']
+    }
+  ]
+}
+
 const overviewCopy = {
   currentProject: {
     loadingLabel: 'Loading current project…',
@@ -115,6 +167,13 @@ const overviewCopy = {
     emptyGuidance: 'Workspace events will appear here.',
     errorTitle: 'Activity could not be loaded',
     errorCause: 'The simulated activity feed is unavailable.'
+  },
+  kpis: {
+    loadingLabel: 'Loading key metrics…',
+    emptyTitle: 'No metrics yet',
+    emptyGuidance: 'Metrics appear after simulated agent sessions run.',
+    errorTitle: 'Key metrics could not be loaded',
+    errorCause: 'The simulated metrics source is unavailable.'
   }
 } satisfies Record<string, ScenarioCopy>
 
@@ -124,6 +183,7 @@ export interface OverviewViewModel {
   issueQueue: ScenarioSlice<typeof mockCatalog.issueQueue>
   recentUsage: ScenarioSlice<typeof mockCatalog.recentUsage>
   activity: ScenarioSlice<typeof mockCatalog.activity>
+  kpis: ScenarioSlice<readonly KpiViewModel[]>
 }
 
 export function selectOverviewView(state: ExperienceState): OverviewViewModel {
@@ -142,7 +202,8 @@ export function selectOverviewView(state: ExperienceState): OverviewViewModel {
     sessions: selectScenarioSlice(state, mockCatalog.sessions, overviewCopy.sessions),
     issueQueue: selectScenarioSlice(state, mockCatalog.issueQueue, overviewCopy.issues),
     recentUsage: selectScenarioSlice(state, mockCatalog.recentUsage, overviewCopy.usage),
-    activity: selectScenarioSlice(state, mockCatalog.activity, overviewCopy.activity)
+    activity: selectScenarioSlice(state, mockCatalog.activity, overviewCopy.activity),
+    kpis: selectScenarioSlice(state, buildKpiViewModels(), overviewCopy.kpis)
   }
 }
 

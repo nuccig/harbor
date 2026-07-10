@@ -298,3 +298,37 @@
     transition: none;
   }
 }
+
+/* MetricTile — novo componente, P2.3. Valores fixos auditados —
+   ver memory/contrast-audit.md / ADR-0003. Não recalcular. */
+
+.metricTile {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+}
+
+.metricLabel {
+  color: var(--ink-muted);
+  font-size: var(--type-small);
+  font-weight: var(--weight-label);
+}
+
+.metricValue {
+  color: var(--ink);
+  font-size: var(--type-metric);
+  font-weight: var(--weight-heading);
+  line-height: 1.1;
+}
+
+.metricSpark {
+  pointer-events: none; /* inert by construction — AC-016 */
+}
+
+.metricSparkBar {
+  fill: var(--accent, var(--border));
+  fill-opacity: 0.75; /* audited: 4.16 / 3.64 / 3.80 :1 — memory/contrast-audit.md */
+}

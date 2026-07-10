@@ -1,6 +1,7 @@
 export * from './Button'
 export * from './Field'
 export * from './FocusHeading'
+export * from './MetricTile'
 export * from './SemanticIcon'
 export * from './Skeleton'
 export * from './SkipTarget'

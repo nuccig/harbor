@@ -1,0 +1,72 @@
+# Estado do Pipeline — P2.3 (KPI strip + sparkline-maré)
+
+## Status Atual
+
+**Fase**: `done` (run encerrada)
+**Saída**: PR #6 (ready) `feat/night-harbor-p2-kpi-strip` → `feat/night-harbor-p2-statuschip-nav` (stacked sobre PR #5; cadeia #2 ← #4 ← #5 ← #6)
+**Próximo lote**: P2.4 (ações inline nos cards de sessão) — depois P2.5/P2.6 da proposta
+**Data**: 2026-07-10
+**Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
+**Modo**: pipeline normal (sem --audit)
+**Origem**: proposta-melhorias-001.md §4 — P2.3 (KPI strip no Overview)
+
+## Decisões do triage/grill (HITL, 2026-07-10)
+
+| # | Decisão | Escolha |
+|---|---------|---------|
+| G0a | Modo pipeline | Normal (sem audit) |
+| G0b | Branch base | Stack em feat/night-harbor-p2-statuschip-nav (PR #6 → PR #5) |
+| G1 | KPIs e dados | 4 KPIs (agentes ativos, fila, taxa de sucesso, agent time); mock estendido com bloco kpis (valores + séries determinísticas); derivação onde possível, dado novo só p/ taxa de sucesso |
+| G2 | Recent usage | KPI strip SUBSTITUI o painel no Overview; slice recentUsage permanece no mock p/ compat |
+| G3 | Sparkline lib | **Recharts** (dep nova aprovada HITL) — SVG, jsdom-testável; estática, aria-hidden, 8–12 barras, accent c/ opacidade |
+| G4 | Legados | Fallback var() neutro (precedente G4 do P2 anterior); MetricTile em ui/; zero edição em command-deck/signal-poster |
+
+## Brain Recall (atlas, 2026-07-10)
+
+- L contrast-math-by-script: WCAG por script node, nunca aritmética LLM; compor cor efetiva de tints antes de medir
+- L visual-contrast-against-canvas: medir contra canvas real, não só surface do card
+- L css-module-class-asserts: asserts por substring; counts derivados de fixture
+- L verify-gate-blind-to-contrast + on-token-semantics + motion-override (já na constitution)
+- Skill dataviz disponível — referenciar no handoff p/ plan (sparkline)
+
+## Fases
+
+| Fase | Status |
+|------|--------|
+| 0 Triage | ✓ (normal, stack sobre PR #5) |
+| 0.5 Brain recall | ✓ |
+| 1 Constitution | ✓ aprovada (reuso P2 c/ ajustes) |
+| 2 Grill-me | ✓ (4 perguntas; G3 revisada p/ Recharts a pedido do usuário) |
+| 3 Spec | ✓ aprovada HITL (18 ACs EARS) |
+| 4 Handoff spec→plan | ✓ handoff-001.md |
+| 5 Plan | ✓ aprovado HITL (3 ADRs; contrast-audit reconfirmado pelo controller por script; trade-off AC-014 = A accent nativo; copy "Key metrics" mantida). Nota: plan-agent caiu 1× por session limit; retomado via SendMessage (protocolo contract.md) e concluiu |
+
+## Decisões do gate do plan (vinculantes)
+
+1. AC-014 "degradação neutra" = interpretação A: legados renderizam com accent nativo (verde command-deck / roxo signal-poster); zero código por concept; ratios auditados ≥3:1 nos 3.
+2. Copy: grupo "Key metrics"; tiles "Active agents / Issue queue / Success rate / Agent time".
+3. Sparkline: `fill: var(--accent, var(--border))` + `fill-opacity: 0.75` (4.16/3.64/3.80:1); numeral `var(--ink)` sobre `var(--surface-raised)` (14.09/16.96/15.78:1) — reconfirmados pelo controller (scratchpad/contrast-check.js).
+4. Recharts ^3.9.2: `{ Bar, BarChart }` only, 48×16 fixo, margin zerado, `accessibilityLayer={false}`, `isAnimationActive={false}`, setup.ts intocado.
+
+| 6 Handoff plan→tasks | ✓ handoff-002.md (D-005..D-009, N4..N7) |
+| 7 Tasks | ✓ 3 tasks (001 dados ∥ 002 componente → 003 shell); scopes disjuntos validados pelo controller |
+| 8 Analyze | ✓ PASS 18/18 ACs, zero contradições bloqueantes; 3 gaps menores corrigidos pelo controller (covers AC-014 na 003, limpeza .dataList CSS na 003, vitest 2.1.9 no ADR-0002) |
+| 9 Handoff →implement | ✓ handoff-003.md (D-010/D-011, N8..N11) |
+| 10 Implement | ✓ 001∥002 paralelas (5eb61e2, 57e19ca) → 003 serial (3449497); gates 171→180→181 verdes |
+| 12 Verify | ✓ controller: lint 0, tsc 0, 181/181; openwiki n/a |
+| 13 Review | ✓ round 001: 0 Critical/High, 2 Medium, 3 Low (2ebac39) |
+| 14 Handoff →fix | ✓ handoff-005.md |
+| 15 Fix | ✓ 5/5 resolvidos (2eb649b): counts derivados, render-test Key metrics, isSessionActive/resolveAgentTime extraídos, fallback testado, spec anotada |
+| 16 Verify | ✓ controller: 185/185 |
+| 17 Re-review | ✓ CLEAN (000-recheck-clean.md), verificação independente |
+| — Visual | HITL: seguir precedente P2 — sem screenshot; gap documentado no round summary |
+| 18 Handoff →consolidate | ✓ handoff-006.md |
+| 19 Consolidate | ✓ HITL 8/8 aprovados: skill harbor-night-harbor-ui atualizada, ADR-0015/0016 em docs/adr/, regra dura de contraste-no-plan na fonte opencode (sdd-plan + constitution-template) + sync rodado |
+| 19.5 Brain-sync | ✓ atlas: recharts-jsdom-testing-gotchas + parallel-tasks-symbol-coupling-joint-verify-gate (novas), cross-links em contrast-math-by-script e css-module-class-asserts, index atualizado |
+
+Nota de processo: consolidate-agent caiu 1× (sessão anterior do harness encerrou); retomado via SendMessage do transcript e concluiu — mesmo protocolo do plan-agent.
+Pendente pós-merge: cleanup sdd-memory (arquivar handoffs, compactar).
+
+Learning novo do implement (p/ consolidate): Recharts 3 `<Bar>` monta `JavascriptAnimate` que lê `window.matchMedia('(prefers-reduced-motion)')` e chama `.addEventListener` MESMO com `isAnimationActive={false}` — mock simples `{ matches }` quebra o mount; teste precisa de stub completo de MediaQueryList. Recharts também aplica a className do `<Bar>` no `<g>` wrapper além de cada `<path>` (contagem de barras deve filtrar por tagName).
+
+**Última atualização**: 2026-07-10 — controller (spec aprovada)

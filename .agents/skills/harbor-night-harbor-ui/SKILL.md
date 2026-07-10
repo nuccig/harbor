@@ -81,6 +81,21 @@ desktop-only filters that govern all UI work. Decision source:
   label **always visible** (truncate with ellipsis, never hide). navIcons: Compass (overview),
   FolderOpen (projects), Boat (sessions — harbor metaphor), Tray (issues), GearSix (settings).
   Active pill on `[aria-current='page']`: `--surface-active` background + `--accent` border.
+- **MetricTile/Sparkline (P2.3)**: KPI tiles live in `src/renderer/src/ui/MetricTile.tsx`.
+  Props are primitives only (`{ label, value, series: readonly number[] }`) — the component is
+  type-isolated from `selectors.ts`/`mock-catalog.ts` (enables parallel data/component tasks).
+  Tile background `var(--surface-raised)`; numeral plain `var(--ink)` — no tone-per-KPI without
+  a defined business threshold. Sparkline: Recharts `{ Bar, BarChart }` named imports only;
+  fixed `width={48} height={16}` — **no** `ResponsiveContainer` (jsdom has no `ResizeObserver`);
+  `margin` zeroed (Recharts' default margin consumes over half of a 16px canvas); decorative
+  opt-out is mandatory: `accessibilityLayer={false}` (Recharts 3 injects `role="application"` +
+  `tabindex="0"` by default) + `aria-hidden` wrapper + `isAnimationActive={false}` +
+  `pointer-events: none`. Bar color via `className` + CSS module
+  `fill: var(--accent, var(--border))` + `fill-opacity: 0.75` — never the `fill` prop (the
+  presentation attribute loses to the cascade; the CSS-module rule is how `var()` resolves per
+  concept). Audited ratios: sparkline 4.16/3.64/3.80:1 (≥3:1 non-text), numeral
+  14.09/16.96/15.78:1 across the 3 concepts. Legacy concepts render their **native** accent
+  (zero per-concept code) — resolved reading of "neutral degradation" (ADR-0016).
 
 ## Testing (renderer components)
 
@@ -89,6 +104,18 @@ desktop-only filters that govern all UI work. Decision source:
 - Counts/values asserted in tests must be derived from the fixture source
   (`mockCatalog.agents.filter(...).length`), never hardcoded literals. (atlas learning:
   `css-module-class-asserts-substring-and-fixture-derived`)
+- Recharts `<Bar className>` lands on the `<g>` series wrapper AND on each `<path>` — counting
+  bars by raw class selector over-counts by +1. Filter `tagName === 'path'` (or use
+  `.recharts-rectangle`) before comparing with `series.length`.
+- Recharts 3 `<Bar>` mounts `JavascriptAnimate`, which calls
+  `window.matchMedia('(prefers-reduced-motion)').addEventListener` unconditionally — even with
+  `isAnimationActive={false}`. jsdom tests need a full `MediaQueryList` stub (`matches`,
+  `addEventListener`, `removeEventListener`, plus `addListener`/`removeListener` for lib
+  compat); the minimal `{ matches }` stub breaks the mount.
+- Recharts clip-path ids (`recharts<N>-clip`) and React 18 `useId` output (`:r<N>:`) are
+  volatile per mount — normalize them via regex to a fixed placeholder before comparing
+  `innerHTML` between two renders; raw string comparison is a guaranteed false negative.
+  (atlas learning: `recharts-jsdom-testing-gotchas`)
 
 ## Anti-patterns (never)
 
@@ -114,6 +141,12 @@ desktop-only filters that govern all UI work. Decision source:
   (`on-success` over 85% tint = 1.50:1, fails AA — ADR-0014).
 - **Never** assert CSS module classes with literal `toHaveClass` — hashed class names break it;
   use substring matching (`[class*="..."]` + `className.toContain`).
+- **Never** color a Recharts mark via the `fill`/`stroke` props when it must follow the token
+  system — use `className` + CSS module so `var()` resolves in the cascade (the presentation
+  attribute always loses to the CSS rule).
+- **Never** mount a decorative Recharts chart with the library defaults — without
+  `accessibilityLayer={false}` it becomes a keyboard tab-stop (`role="application"` +
+  `tabindex="0"`), and without zeroed `margin` a sparkline-scale chart is mostly invisible.
 
 ## References
 
@@ -123,5 +156,7 @@ desktop-only filters that govern all UI work. Decision source:
 - `styles/global.css`, `design-lab/DesignLab.tsx`
 - Atlas: `nucci-0016-ambient-layer`, `gpu-fallback-detect-values-not-keys`,
   `navbar-contrast-color-mix-over-ambient`, `css-js-dual-gate-provable-non-regression`
-- ADRs 0001–0014 (`docs/adr/`)
+- ADRs 0001–0016 (`docs/adr/`)
+- `.orquestrador/night-harbor-p2-kpi-strip/adr/` (run-local: 0001 KPI derivation, 0002 Recharts
+  integration → docs 0015, 0003 MetricTile colors → docs 0016)
 - ui-ux-pro-max skill (design system search baseline)
