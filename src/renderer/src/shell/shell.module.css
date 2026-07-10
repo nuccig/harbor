@@ -117,32 +117,37 @@
   margin: 0;
 }
 
-.projectSummary,
-.dataList {
+.projectSummary {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
 }
 
-.projectSummary > div,
-.dataList > div {
+.projectSummary > div {
   display: grid;
   gap: var(--space-1);
 }
 
-.projectSummary dt,
-.dataList dt {
+.projectSummary dt {
   color: var(--ink-muted);
   font-size: var(--type-small);
 }
 
-.projectSummary dd,
-.dataList dd {
+.projectSummary dd {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.kpiStrip {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .itemList,

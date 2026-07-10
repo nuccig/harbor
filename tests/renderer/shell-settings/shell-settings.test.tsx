@@ -99,10 +99,63 @@ describe('Shell and settings', () => {
       screen.getByRole('heading', { level: 2, name: 'Issue queue' })
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Recent usage' })
+      screen.getByRole('heading', { level: 2, name: 'Key metrics' })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { level: 2, name: 'Activity' })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Recent usage' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders the Key metrics KPI strip with exactly 4 tiles in the fixed semantic order', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <OnboardingCompletionHarness />
+      </ExperienceTestRoot>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Complete onboarding' }))
+
+    const keyMetricsHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Key metrics'
+    })
+    const keyMetricsGroup = keyMetricsHeading.closest('[data-surface-slot]')
+    expect(keyMetricsGroup).toBeTruthy()
+    const group = within(keyMetricsGroup as HTMLElement)
+
+    const tiles = group.getAllByRole('listitem')
+    expect(tiles).toHaveLength(4)
+
+    const activeAgentsCount = mockCatalog.sessions.filter(
+      (session) => session.status === 'Running'
+    ).length
+    const issueQueueCount = mockCatalog.issueQueue.length
+    const successRate = mockCatalog.kpis.successRate
+    const agentTime = mockCatalog.recentUsage.find(
+      (usage) => usage.label === 'Agent time'
+    )?.value
+
+    expect(within(tiles[0]).getByText('Active agents')).toBeInTheDocument()
+    expect(within(tiles[0]).getByText(String(activeAgentsCount))).toBeInTheDocument()
+
+    expect(within(tiles[1]).getByText('Issue queue')).toBeInTheDocument()
+    expect(within(tiles[1]).getByText(String(issueQueueCount))).toBeInTheDocument()
+
+    expect(within(tiles[2]).getByText('Success rate')).toBeInTheDocument()
+    expect(within(tiles[2]).getByText(`${successRate}%`)).toBeInTheDocument()
+
+    expect(within(tiles[3]).getByText('Agent time')).toBeInTheDocument()
+    expect(within(tiles[3]).getByText(agentTime ?? '—')).toBeInTheDocument()
+
+    // Scoped "Issue queue" collision check: the group heading (queue slot) and the
+    // tile label (utility slot) share the same text but live in different sections.
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Issue queue' })
     ).toBeInTheDocument()
   })
 

@@ -20,6 +20,7 @@ import { Settings } from '../settings'
 import {
   Button,
   FocusHeading,
+  MetricTile,
   SemanticIcon,
   SkipLink,
   SkipTarget,
@@ -79,23 +80,6 @@ const destinations = Object.entries(mockCatalog.labels.destinations) as readonly
   ShellDestination,
   string
 ][]
-
-function DataList({
-  items
-}: {
-  items: readonly { label: string; value: string }[]
-}) {
-  return (
-    <dl className={styles.dataList}>
-      {items.map((item) => (
-        <div key={item.label}>
-          <dt>{item.label}</dt>
-          <dd>{item.value}</dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
 
 function ScenarioGroup<T>({
   children,
@@ -243,10 +227,18 @@ function Overview() {
       />
       <ScenarioGroup
         onAction={handleAction}
-        renderReady={(usage) => <DataList items={usage} />}
-        slice={overview.recentUsage}
+        renderReady={(kpis) => (
+          <ul className={styles.kpiStrip}>
+            {kpis.map((kpi) => (
+              <li key={kpi.id}>
+                <MetricTile label={kpi.label} value={kpi.value} series={kpi.series} />
+              </li>
+            ))}
+          </ul>
+        )}
+        slice={overview.kpis}
         slot="utility"
-        title="Recent usage"
+        title="Key metrics"
       />
       <ScenarioGroup
         onAction={handleAction}
