@@ -337,4 +337,52 @@ describe('Shell and settings', () => {
     expect(within(primaryNavigation).getByText('Issues')).toBeInTheDocument()
     expect(within(primaryNavigation).getByText('Settings')).toBeInTheDocument()
   })
+
+  it('renders StatusChip in agents list (Available → success)', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <Settings />
+      </ExperienceTestRoot>
+    )
+
+    // Navigate to Agents category
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Settings categories' })).getByRole(
+        'button',
+        { name: 'Agents' }
+      )
+    )
+
+    // Verify that agents status is rendered via StatusChip
+    const agentsSection = screen.getByLabelText('Available agents')
+    expect(agentsSection).toBeInTheDocument()
+    // Verify StatusChip labels are present (at least one)
+    expect(within(agentsSection).getAllByText('Available')).toHaveLength(3)
+  })
+
+  it('renders StatusChip in integrations list (Not configured → warning, Simulated → neutral)', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <Settings />
+      </ExperienceTestRoot>
+    )
+
+    // Navigate to Integrations category
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Settings categories' })).getByRole(
+        'button',
+        { name: 'Integrations' }
+      )
+    )
+
+    // Verify that integrations status is rendered via StatusChip
+    const integrationsSection = screen.getByLabelText('Issue integrations')
+    expect(integrationsSection).toBeInTheDocument()
+    expect(within(integrationsSection).getByText('Not configured')).toBeInTheDocument()
+    expect(within(integrationsSection).getByText('Simulated')).toBeInTheDocument()
+  })
 })

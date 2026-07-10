@@ -12,7 +12,7 @@ import type {
 import { mockCatalog } from '../app/mock-catalog'
 import { selectSettingsView } from '../app/selectors'
 import { ScenarioPresenter } from '../scenarios'
-import { Button, FocusHeading } from '../ui'
+import { Button, FocusHeading, StatusChip } from '../ui'
 import styles from './settings.module.css'
 
 const categories = Object.entries(mockCatalog.labels.settingsCategories) as readonly [
@@ -21,6 +21,29 @@ const categories = Object.entries(mockCatalog.labels.settingsCategories) as read
 ][]
 
 type UpdateSettingAction = Extract<ExperienceAction, { type: 'updateSetting' }>
+
+// Mappers — semântica de domínio vive onde é usada
+const mapAgentStatusToTone = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+  switch (status) {
+    case 'Available':
+      return 'success'
+    default:
+      return 'neutral'
+  }
+}
+
+const mapIntegrationStatusToTone = (
+  status: string
+): 'success' | 'warning' | 'danger' | 'neutral' => {
+  switch (status) {
+    case 'Not configured':
+      return 'warning'
+    case 'Simulated':
+      return 'neutral'
+    default:
+      return 'neutral'
+  }
+}
 
 function SettingToggle({
   checked,
@@ -142,7 +165,7 @@ function AgentSettings({
         {mockCatalog.agents.map((agent) => (
           <li key={agent.id}>
             <span>{agent.label}</span>
-            <span>{agent.status}</span>
+            <StatusChip tone={mapAgentStatusToTone(agent.status)} label={agent.status} />
           </li>
         ))}
       </ul>
@@ -157,7 +180,10 @@ function IntegrationSettings({ onSimulate }: { onSimulate: (label: string) => vo
         <li key={integration.id}>
           <span>
             <strong>{integration.label}</strong>
-            <span>{integration.status}</span>
+            <StatusChip
+              tone={mapIntegrationStatusToTone(integration.status)}
+              label={integration.status}
+            />
           </span>
           <Button
             aria-label={`Simulate ${integration.label} connection`}
