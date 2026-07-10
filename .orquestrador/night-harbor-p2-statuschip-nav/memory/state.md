@@ -37,23 +37,19 @@
 | 2 Grill-me | ✓ (4 perguntas) |
 | 3 Spec | ✓ aprovada HITL, commit 41f0183 |
 | 4 Handoff spec→plan | ✓ handoff-001.md |
-| 5 Plan | ⚠ BLOCKED — gate HITL resolvido, correção dos docs pendente |
-| 6+ | pendente |
+| 5 Plan | ✓ aprovado HITL + correção de contraste aplicada (rev. 2) |
+| 6 Handoff plan→tasks | em andamento |
+| 7+ | pendente |
 
-## BLOQUEIO ATIVO (2026-07-09)
+## Decisões do gate do plan (vinculantes, incorporadas na rev. 2)
 
-**Causa**: session limit da conta Claude — reseta 21:40 America/Sao_Paulo. Plan-agent (id a20df45bf55b8b4ea) morreu ao aplicar correções pós-gate.
-
-**Gate do plan JÁ RESOLVIDO pelo usuário** (decisões vinculantes):
-1. Chip: fundo `color-mix(in srgb, var(--tone), transparent 85%)` + texto/ícone/dot na COR DO TOKEN (não on-*); neutral usa `--ink-muted`. Ratios auditados (controller, WCAG exato): success 7.10:1, warning 8.48:1, danger 6.08:1, neutral 7.97:1 ✓.
+1. Chip: fundo `color-mix(in srgb, var(--tone), transparent 85%)` + texto/ícone/dot na COR DO TOKEN (não on-*); neutral usa `--ink-muted`. Ratios (WCAG exato): success 7.10:1, warning 8.48:1, danger 6.08:1, neutral 7.97:1 ✓.
 2. Fallback sem color-mix: bg sólido `var(--surface-raised)` (#152642) — 8.51/10.49/6.88/7.74 ✓.
-3. on-* NÃO usados no chip (reservados a fills sólidos).
+3. on-* NÃO usados no chip (reservados a fills sólidos futuros).
 4. Ícones por tone: CheckCircle/Clock/Warning/Minus (Regular).
-5. Mapeamento inline Shell/Settings; icon prop opcional default por tone; dot = cor token; pill ativa reusa --surface-active.
-6. Legados: cadeia var() fallback — texto `var(--success, var(--ink-muted))`, bg `var(--surface-raised)`.
+5. Mapeamento inline Shell/Settings; icon prop opcional default por tone; dot = cor token; pill ativa reusa --surface-active (ink 11.15:1, borda accent 4.93:1 ✓).
+6. Legados: cadeia var() fallback — texto `var(--success, var(--ink-muted))`, bg `var(--surface-raised)` (existe nos 3 conceitos).
 
-**ERRO CONHECIDO nos docs do plan (NÃO commitados)**: plan.md/adr-0001/adr-0002/contrast-audit.md ainda propõem texto on-* sobre tintado (1.4–1.7:1 FALHA) e luminâncias erradas (ex. L de #0e1b2f é ~0.011, não 0.15; Descoberta 8 inverteu fórmula). Trade-off 80% vs 85% é escolha falsa — ambos falham com on-*.
+Nota de processo: plan-agent caiu 1× por session limit da conta durante a correção; retry único (protocolo contract.md) concluiu. Auditoria numérica do controller pegou erro grave do plan rev. 1 (texto on-* sobre tintado = 1.4–1.7:1; luminâncias erradas na contrast-audit rev. 1).
 
-**Retomada**: re-despachar plan-agent (SendMessage para a20df45bf55b8b4ea ou novo spawn) com as 6 decisões acima para corrigir plan.md §2.5/§2.7/§5, adr/0001, adr/0002, memory/contrast-audit.md. Depois: commit plan → handoff plan→tasks → tasks-agent.
-
-**Última atualização**: 2026-07-09 — controller (bloqueio session limit)
+**Última atualização**: 2026-07-09 — controller (plan fechado)
