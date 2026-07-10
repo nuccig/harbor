@@ -14,7 +14,7 @@ import {
 import type { ShellDestination } from '../app/experience-model'
 import { mockCatalog } from '../app/mock-catalog'
 import type { ScenarioSlice, SharedAction } from '../app/mock-catalog'
-import { selectShellView } from '../app/selectors'
+import { isSessionActive, selectShellView } from '../app/selectors'
 import { ScenarioPresenter } from '../scenarios'
 import { Settings } from '../settings'
 import {
@@ -31,9 +31,10 @@ import styles from './shell.module.css'
 // Mappers — semântica de domínio vive onde é usada (decision HITL)
 
 const mapSessionStatusToTone = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+  if (isSessionActive(status)) {
+    return 'success'
+  }
   switch (status) {
-    case 'Running':
-      return 'success'
     case 'Ready':
       return 'warning'
     case 'Complete':

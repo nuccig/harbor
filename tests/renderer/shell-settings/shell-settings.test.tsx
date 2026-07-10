@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ReactNode } from 'react'
+import { useLayoutEffect, type ReactNode } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
   ExperienceProvider,
@@ -8,6 +8,7 @@ import {
   useExperienceState
 } from '../../../src/renderer/src/app/ExperienceProvider'
 import type {
+  ScenarioId,
   SettingsCategory,
   ShellDestination
 } from '../../../src/renderer/src/app/experience-model'
@@ -39,6 +40,25 @@ function ShellWithToast() {
 function OnboardingCompletionHarness() {
   const state = useExperienceState()
   const dispatch = useExperienceDispatch()
+
+  if (state.phase === 'onboarding') {
+    return (
+      <Button onClick={() => dispatch({ type: 'completeOnboarding' })}>
+        Complete onboarding
+      </Button>
+    )
+  }
+
+  return <Shell />
+}
+
+function ScenarioOnboardingHarness({ scenario }: { scenario: ScenarioId }) {
+  const state = useExperienceState()
+  const dispatch = useExperienceDispatch()
+
+  useLayoutEffect(() => {
+    dispatch({ type: 'selectScenario', scenario })
+  }, [dispatch, scenario])
 
   if (state.phase === 'onboarding') {
     return (
@@ -129,7 +149,8 @@ describe('Shell and settings', () => {
     const group = within(keyMetricsGroup as HTMLElement)
 
     const tiles = group.getAllByRole('listitem')
-    expect(tiles).toHaveLength(4)
+    const expectedTileCount = Object.keys(mockCatalog.kpis.series).length
+    expect(tiles).toHaveLength(expectedTileCount)
 
     const activeAgentsCount = mockCatalog.sessions.filter(
       (session) => session.status === 'Running'
@@ -158,6 +179,43 @@ describe('Shell and settings', () => {
       screen.getByRole('heading', { level: 2, name: 'Issue queue' })
     ).toBeInTheDocument()
   })
+
+  const kpiScenarios: readonly [ScenarioId, readonly string[]][] = [
+    ['loading', ['Loading key metrics…']],
+    ['empty', ['No metrics yet', 'Metrics appear after simulated agent sessions run.']],
+    ['error', ['Key metrics could not be loaded']]
+  ]
+
+  it.each(kpiScenarios)(
+    'renders the Key metrics group %s scenario scoped to its own group',
+    async (scenario, expectedTexts) => {
+      const user = userEvent.setup()
+
+      render(
+        <ExperienceTestRoot>
+          <ScenarioOnboardingHarness scenario={scenario} />
+        </ExperienceTestRoot>
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Complete onboarding' }))
+
+      const keyMetricsHeading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Key metrics'
+      })
+      const keyMetricsGroup = keyMetricsHeading.closest('[data-surface-slot]')
+      expect(keyMetricsGroup).toBeTruthy()
+      const group = within(keyMetricsGroup as HTMLElement)
+
+      for (const text of expectedTexts) {
+        expect(group.getByText(text)).toBeInTheDocument()
+      }
+
+      if (scenario === 'error') {
+        expect(group.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+      }
+    }
+  )
 
   it.each(destinations)(
     'navigates to %s by keyboard, identifies it as current, and keeps primary navigation',

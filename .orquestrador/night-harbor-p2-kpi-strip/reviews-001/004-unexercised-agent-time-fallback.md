@@ -1,7 +1,7 @@
 ---
 id: 004
 severity: low
-status: open
+status: resolved
 location: src/renderer/src/app/selectors.ts:90-91
 created: 2026-07-10
 ---
@@ -31,4 +31,23 @@ renders as expected. Not blocking.
 
 ## Resolution
 
-<Filled by sdd-fix-review: what changed, or the rationale for `wontfix`.>
+Took the first of the two routes the handoff offered: extracted the lookup as a pure, exported
+function rather than mocking the `mock-catalog` module. `src/renderer/src/app/selectors.ts` now
+exports:
+
+```ts
+export function resolveAgentTime(recentUsage: MockCatalog['recentUsage']): string {
+  return recentUsage.find((u) => u.label === 'Agent time')?.value ?? '—'
+}
+```
+
+`buildKpiViewModels()` calls `resolveAgentTime(mockCatalog.recentUsage)` instead of inlining the
+lookup. Added a test in `tests/renderer/model/selectors.test.ts` ("falls back to an em dash when
+recentUsage has no Agent time entry") that filters `mockCatalog.recentUsage` down to an array
+without the `'Agent time'` label (derived from the fixture, not a hand-built literal array) and
+asserts `resolveAgentTime(...)` returns `'—'`; a second assertion in the same test confirms the
+happy path still returns the fixture's real value when the label is present, so both branches of
+the `??` are directly exercised.
+
+Verified: `npm run lint && npm run typecheck && npm run test` all pass, 185/185 tests (up from
+181; +1 from this fix, +3 from issue 002).

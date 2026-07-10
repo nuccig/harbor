@@ -150,7 +150,9 @@ Testable statements using EARS patterns — each one should map to a check later
 
 - [ ] **AC-013** — **WHERE** o conceito visual ativo é night-harbor **WHEN** os tiles de KPI
   renderizam **THEN** as cores do numeral e da sparkline resolvem para os tokens da paleta Night
-  Harbor já existentes (sucesso/atenção/accent).
+  Harbor já existentes (sucesso/atenção/accent — pool de tokens aceitáveis, satisfeito ao
+  resolver para qualquer membro do pool; não é mandato de usar os três. Ver ADR-0003
+  "Alternatives considered" para a leitura aprovada no gate HITL do plan).
 - [ ] **AC-014** — **WHERE** o conceito visual ativo é um conceito legado (command-deck ou
   signal-poster) **WHEN** os tiles de KPI renderizam **THEN** eles degradam para uma aparência
   neutra por fallback, sem exigir nenhuma edição nesses conceitos.

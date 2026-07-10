@@ -7,6 +7,7 @@ import {
 } from '../../../src/renderer/src/app/experience-model'
 import { mockCatalog } from '../../../src/renderer/src/app/mock-catalog'
 import {
+  resolveAgentTime,
   selectActiveAssessment,
   selectOnboardingView,
   selectOverviewView,
@@ -193,6 +194,17 @@ describe('KPI view models', () => {
 
     const view = selectOverviewView(createInitialExperienceState())
     expect(view.recentUsage.status).toBe('ready')
+  })
+
+  it('falls back to an em dash when recentUsage has no Agent time entry', () => {
+    const recentUsageWithoutAgentTime = mockCatalog.recentUsage.filter(
+      (usage) => usage.label !== 'Agent time'
+    )
+
+    expect(resolveAgentTime(recentUsageWithoutAgentTime)).toBe('—')
+    expect(resolveAgentTime(mockCatalog.recentUsage)).toBe(
+      mockCatalog.recentUsage.find((usage) => usage.label === 'Agent time')?.value
+    )
   })
 })
 

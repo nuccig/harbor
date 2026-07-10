@@ -6,6 +6,7 @@ import {
 } from './experience-model'
 import {
   mockCatalog,
+  type MockCatalog,
   type ScenarioSlice,
   type SharedAction
 } from './mock-catalog'
@@ -84,11 +85,22 @@ export interface KpiViewModel {
   series: readonly number[]
 }
 
+// Single source of truth for "what counts as active" — shared with Shell.tsx's
+// mapSessionStatusToTone so the two call sites can't drift apart (review 003).
+export function isSessionActive(status: string): boolean {
+  return status === 'Running'
+}
+
+// Extracted so the '—' fallback branch is directly testable without depending on
+// mockCatalog's frozen singleton shape (review 004).
+export function resolveAgentTime(recentUsage: MockCatalog['recentUsage']): string {
+  return recentUsage.find((u) => u.label === 'Agent time')?.value ?? '—'
+}
+
 function buildKpiViewModels(): readonly KpiViewModel[] {
-  const activeAgents = mockCatalog.sessions.filter((s) => s.status === 'Running').length
+  const activeAgents = mockCatalog.sessions.filter((s) => isSessionActive(s.status)).length
   const queued = mockCatalog.issueQueue.length
-  const agentTime =
-    mockCatalog.recentUsage.find((u) => u.label === 'Agent time')?.value ?? '—'
+  const agentTime = resolveAgentTime(mockCatalog.recentUsage)
   return [
     {
       id: 'active-agents',

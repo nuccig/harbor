@@ -1,7 +1,7 @@
 ---
 id: 005
 severity: low
-status: open
+status: resolved
 location: spec.md:151-153 (AC-013 wording) vs src/renderer/src/ui/MetricTile.tsx and primitives.module.css
 created: 2026-07-10
 ---
@@ -34,4 +34,24 @@ documentation gap between the spec's literal wording and its resolved interpreta
 
 ## Resolution
 
-<Filled by sdd-fix-review: what changed, or the rationale for `wontfix`.>
+**Decision: took the "opção recomendada"** — annotated `spec.md`, not doc-only-in-issue-file.
+Rationale: the gap this issue names is specifically that a future reader of *only* `spec.md`
+(without cross-referencing the review issue files, which are workflow-scoped and not part of the
+feature's durable documentation) would have no way to know the wording was deliberately read as a
+pool. A note confined to this issue file would not reach that reader; the annotation has to live in
+`spec.md` itself to close the gap for good. Cost was one line, no risk (parenthetical addition,
+no wording removed).
+
+`spec.md` AC-013 (line ~151) now reads:
+
+> **AC-013** — **WHERE** o conceito visual ativo é night-harbor **WHEN** os tiles de KPI renderizam
+> **THEN** as cores do numeral e da sparkline resolvem para os tokens da paleta Night Harbor já
+> existentes (sucesso/atenção/accent — pool de tokens aceitáveis, satisfeito ao resolver para
+> qualquer membro do pool; não é mandato de usar os três. Ver ADR-0003 "Alternatives considered"
+> para a leitura aprovada no gate HITL do plan).
+
+No changes to `MetricTile.tsx` or `primitives.module.css`, per the handoff's explicit instruction —
+the implementation was already correct and approved.
+
+Verified: `npm run lint && npm run typecheck && npm run test` all pass, 185/185 tests (doc-only
+change, no test impact expected or observed).

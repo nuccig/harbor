@@ -1,7 +1,7 @@
 ---
 id: 001
 severity: medium
-status: open
+status: resolved
 location: tests/renderer/shell-settings/shell-settings.test.tsx:132
 created: 2026-07-10
 ---
@@ -57,4 +57,15 @@ line 134.)
 
 ## Resolution
 
-<Filled by sdd-fix-review: what changed, or the rationale for `wontfix`.>
+Applied the suggested fix as-is. `tests/renderer/shell-settings/shell-settings.test.tsx:132-133` now
+reads:
+
+```ts
+const tiles = group.getAllByRole('listitem')
+const expectedTileCount = Object.keys(mockCatalog.kpis.series).length
+expect(tiles).toHaveLength(expectedTileCount)
+```
+
+The tile count now moves with `mockCatalog.kpis.series` the same way the three neighboring counts
+(`activeAgentsCount`, `issueQueueCount`, `agentTime`) already do — no bare literal left in the test.
+Verified: `npm run lint && npm run typecheck && npm run test` all pass, 185/185 tests (up from 181).

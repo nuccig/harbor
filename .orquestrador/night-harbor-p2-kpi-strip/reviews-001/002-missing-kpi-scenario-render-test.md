@@ -1,7 +1,7 @@
 ---
 id: 002
 severity: medium
-status: open
+status: resolved
 location: tests/renderer/shell-settings/shell-settings.test.tsx (missing coverage); tests/renderer/integration/app-integration.test.tsx:25-47,153-155
 created: 2026-07-10
 ---
@@ -74,4 +74,24 @@ have, closing the gap between the plan's stated intent and what was actually del
 
 ## Resolution
 
-<Filled by sdd-fix-review: what changed, or the rationale for `wontfix`.>
+Added a new `ScenarioOnboardingHarness` component to
+`tests/renderer/shell-settings/shell-settings.test.tsx` (mirrors the existing
+`OnboardingCompletionHarness`, plus a `useLayoutEffect` dispatch of `{ type: 'selectScenario',
+scenario }` before the "Complete onboarding" button renders — analogous to `SeedExperience` in
+`app-integration.test.tsx`, since no component already in this file dispatched `selectScenario`).
+
+Added a new `it.each` block (3 cases: `loading`, `empty`, `error`) that:
+1. Mounts with the harness, dispatching the target scenario, then clicks "Complete onboarding" to
+   reach the Overview (same landing pattern as the existing ready-state test at line 112).
+2. Locates the "Key metrics" heading and scopes to its `[data-surface-slot]` ancestor via
+   `within(...)`, the same pattern already used by the ready-state test.
+3. Asserts the exact copy strings from `overviewCopy.kpis` in `selectors.ts` for each scenario:
+   `loading` → `'Loading key metrics…'`; `empty` → `'No metrics yet'` +
+   `'Metrics appear after simulated agent sessions run.'`; `error` →
+   `'Key metrics could not be loaded'` plus a `within(group)`-scoped "Try again" button.
+
+This closes the render-level coverage gap: a regression isolated to the `kpis` slot's Shell.tsx
+wiring (wrong copy object, wrong `slice` prop) would now fail one of these three new tests, where
+previously nothing in the render-test suite would have caught it. Verified:
+`npm run lint && npm run typecheck && npm run test` all pass, 185/185 tests (up from 181; +3 from
+this fix, +1 from issue 004).
