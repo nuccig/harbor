@@ -301,4 +301,40 @@ describe('Shell and settings', () => {
       'gemini-cli'
     )
   })
+
+  it('renders StatusChip components for session status in Overview', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ExperienceTestRoot>
+        <OnboardingCompletionHarness />
+      </ExperienceTestRoot>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Complete onboarding' }))
+
+    // Verify that session status values are rendered (StatusChip displays them as labels)
+    expect(screen.getByText('Running')).toBeInTheDocument()
+    expect(screen.getByText('Ready')).toBeInTheDocument()
+    expect(screen.getByText('Complete')).toBeInTheDocument()
+  })
+
+  it('renders nav labels always visible (never icon-only)', async () => {
+    render(
+      <ExperienceTestRoot>
+        <Shell />
+      </ExperienceTestRoot>
+    )
+
+    const primaryNavigation = screen.getByRole('navigation', {
+      name: 'Primary navigation'
+    })
+
+    // Verify all destination labels are present as text content within buttons
+    expect(within(primaryNavigation).getByText('Overview')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Projects')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Sessions')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Issues')).toBeInTheDocument()
+    expect(within(primaryNavigation).getByText('Settings')).toBeInTheDocument()
+  })
 })

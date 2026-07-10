@@ -1,4 +1,12 @@
+import type { IconWeight } from '@phosphor-icons/react'
 import type { MouseEvent, ReactNode } from 'react'
+import {
+  Boat,
+  Compass,
+  FolderOpen,
+  GearSix,
+  Tray
+} from '@phosphor-icons/react'
 import {
   useExperienceDispatch,
   useExperienceState
@@ -9,8 +17,63 @@ import type { ScenarioSlice, SharedAction } from '../app/mock-catalog'
 import { selectShellView } from '../app/selectors'
 import { ScenarioPresenter } from '../scenarios'
 import { Settings } from '../settings'
-import { Button, FocusHeading, SkipLink, SkipTarget } from '../ui'
+import {
+  Button,
+  FocusHeading,
+  SemanticIcon,
+  SkipLink,
+  SkipTarget,
+  StatusChip
+} from '../ui'
 import styles from './shell.module.css'
+
+// Mappers — semântica de domínio vive onde é usada (decision HITL)
+
+const mapSessionStatusToTone = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+  switch (status) {
+    case 'Running':
+      return 'success'
+    case 'Ready':
+      return 'warning'
+    case 'Complete':
+      return 'neutral'
+    default:
+      return 'neutral'
+  }
+}
+
+const mapIssuePriorityToTone = (priority: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+  switch (priority) {
+    case 'High':
+      return 'danger'
+    case 'Medium':
+      return 'warning'
+    case 'Low':
+      return 'neutral'
+    default:
+      return 'neutral'
+  }
+}
+
+const mapProjectStatusToTone = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
+  switch (status) {
+    case 'Active':
+      return 'success'
+    default:
+      return 'neutral'
+  }
+}
+
+const navIcons: Record<
+  ShellDestination,
+  React.ComponentType<{ weight?: IconWeight; [key: string]: unknown }>
+> = {
+  overview: Compass,
+  projects: FolderOpen,
+  sessions: Boat,
+  issues: Tray,
+  settings: GearSix
+}
 
 const destinations = Object.entries(mockCatalog.labels.destinations) as readonly [
   ShellDestination,
@@ -115,7 +178,12 @@ function Overview() {
             </div>
             <div>
               <dt>Status</dt>
-              <dd>{project.status}</dd>
+              <dd>
+                <StatusChip
+                  tone={mapProjectStatusToTone(project.status)}
+                  label={project.status}
+                />
+              </dd>
             </div>
           </dl>
         )}
@@ -134,7 +202,12 @@ function Overview() {
                   <strong>{session.agent}</strong>
                   <span>{session.task}</span>
                 </span>
-                <span>{session.status}</span>
+                <span>
+                  <StatusChip
+                    tone={mapSessionStatusToTone(session.status)}
+                    label={session.status}
+                  />
+                </span>
               </li>
             ))}
           </ul>
@@ -154,7 +227,12 @@ function Overview() {
                   <strong>{issue.id}</strong>
                   <span>{issue.title}</span>
                 </span>
-                <span>{issue.priority}</span>
+                <span>
+                  <StatusChip
+                    tone={mapIssuePriorityToTone(issue.priority)}
+                    label={issue.priority}
+                  />
+                </span>
               </li>
             ))}
           </ol>
@@ -205,7 +283,12 @@ function Projects() {
         </div>
         <div>
           <dt>Status</dt>
-          <dd>{mockCatalog.currentProject.status}</dd>
+          <dd>
+            <StatusChip
+              tone={mapProjectStatusToTone(mockCatalog.currentProject.status)}
+              label={mockCatalog.currentProject.status}
+            />
+          </dd>
         </div>
       </dl>
       <p>Project data is local to this demonstration and is not read from disk.</p>
@@ -224,7 +307,12 @@ function Sessions() {
               <strong>{session.agent}</strong>
               <span>{session.task}</span>
             </span>
-            <span>{session.status}</span>
+            <span>
+              <StatusChip
+                tone={mapSessionStatusToTone(session.status)}
+                label={session.status}
+              />
+            </span>
           </li>
         ))}
       </ul>
@@ -243,7 +331,12 @@ function Issues() {
               <strong>{issue.id}</strong>
               <span>{issue.title}</span>
             </span>
-            <span>{issue.priority}</span>
+            <span>
+              <StatusChip
+                tone={mapIssuePriorityToTone(issue.priority)}
+                label={issue.priority}
+              />
+            </span>
           </li>
         ))}
       </ol>
@@ -287,17 +380,23 @@ export function Shell() {
           <strong>Harbor</strong>
         </header>
         <nav aria-label="Primary navigation" className={styles.primaryNavigation}>
-          {destinations.map(([destination, label]) => (
-            <Button
-              aria-current={view.destination === destination ? 'page' : undefined}
-              className={styles.destinationButton}
-              key={destination}
-              onClick={() => dispatch({ type: 'goToDestination', destination })}
-              variant="quiet"
-            >
-              {label}
-            </Button>
-          ))}
+          {destinations.map(([destination, label]) => {
+            const Icon = navIcons[destination]
+            return (
+              <Button
+                aria-current={view.destination === destination ? 'page' : undefined}
+                className={styles.destinationButton}
+                key={destination}
+                onClick={() => dispatch({ type: 'goToDestination', destination })}
+                variant="quiet"
+              >
+                <SemanticIcon decorative>
+                  <Icon weight="regular" />
+                </SemanticIcon>
+                <span>{label}</span>
+              </Button>
+            )
+          })}
         </nav>
         <p className={styles.sessionNote}>Simulated data · resets on reload</p>
       </aside>
