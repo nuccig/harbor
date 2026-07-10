@@ -2,7 +2,7 @@
 
 ## Status Atual
 
-**Fase**: implement + verify verdes → handoff →review
+**Fase**: review clean → consolidate
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
@@ -52,6 +52,12 @@
 | 9 Handoff →implement | ✓ handoff-003.md (D-010/D-011, N8..N11) |
 | 10 Implement | ✓ 001∥002 paralelas (5eb61e2, 57e19ca) → 003 serial (3449497); gates 171→180→181 verdes |
 | 12 Verify | ✓ controller: lint 0, tsc 0, 181/181; openwiki n/a |
+| 13 Review | ✓ round 001: 0 Critical/High, 2 Medium, 3 Low (2ebac39) |
+| 14 Handoff →fix | ✓ handoff-005.md |
+| 15 Fix | ✓ 5/5 resolvidos (2eb649b): counts derivados, render-test Key metrics, isSessionActive/resolveAgentTime extraídos, fallback testado, spec anotada |
+| 16 Verify | ✓ controller: 185/185 |
+| 17 Re-review | ✓ CLEAN (000-recheck-clean.md), verificação independente |
+| — Visual | HITL: seguir precedente P2 — sem screenshot; gap documentado no round summary |
 
 Learning novo do implement (p/ consolidate): Recharts 3 `<Bar>` monta `JavascriptAnimate` que lê `window.matchMedia('(prefers-reduced-motion)')` e chama `.addEventListener` MESMO com `isAnimationActive={false}` — mock simples `{ matches }` quebra o mount; teste precisa de stub completo de MediaQueryList. Recharts também aplica a className do `<Bar>` no `<g>` wrapper além de cada `<path>` (contagem de barras deve filtrar por tagName).
 
