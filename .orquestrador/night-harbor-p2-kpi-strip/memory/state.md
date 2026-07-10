@@ -2,7 +2,7 @@
 
 ## Status Atual
 
-**Fase**: analyze PASS → handoff →implement
+**Fase**: implement + verify verdes → handoff →review
 **Data**: 2026-07-10
 **Branch**: feat/night-harbor-p2-kpi-strip (stacked sobre feat/night-harbor-p2-statuschip-nav / PR #5; cadeia #2 ← #4 ← #5 ← #6)
 **Modo**: pipeline normal (sem --audit)
@@ -49,5 +49,10 @@
 | 6 Handoff plan→tasks | ✓ handoff-002.md (D-005..D-009, N4..N7) |
 | 7 Tasks | ✓ 3 tasks (001 dados ∥ 002 componente → 003 shell); scopes disjuntos validados pelo controller |
 | 8 Analyze | ✓ PASS 18/18 ACs, zero contradições bloqueantes; 3 gaps menores corrigidos pelo controller (covers AC-014 na 003, limpeza .dataList CSS na 003, vitest 2.1.9 no ADR-0002) |
+| 9 Handoff →implement | ✓ handoff-003.md (D-010/D-011, N8..N11) |
+| 10 Implement | ✓ 001∥002 paralelas (5eb61e2, 57e19ca) → 003 serial (3449497); gates 171→180→181 verdes |
+| 12 Verify | ✓ controller: lint 0, tsc 0, 181/181; openwiki n/a |
+
+Learning novo do implement (p/ consolidate): Recharts 3 `<Bar>` monta `JavascriptAnimate` que lê `window.matchMedia('(prefers-reduced-motion)')` e chama `.addEventListener` MESMO com `isAnimationActive={false}` — mock simples `{ matches }` quebra o mount; teste precisa de stub completo de MediaQueryList. Recharts também aplica a className do `<Bar>` no `<g>` wrapper além de cada `<path>` (contagem de barras deve filtrar por tagName).
 
 **Última atualização**: 2026-07-10 — controller (spec aprovada)
