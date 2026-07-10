@@ -95,12 +95,71 @@ de HITL, são detalhes técnicos delegados pela spec):
 
 ---
 
+## Decisões Aprovadas (gate do plan, 2026-07-10)
+
+### D-005: Fórmula "Agentes Ativos" = Sessões `Running`
+
+**Status**: APROVADO (ADR-0001, fecha o gap D-001/R2)
+**Descrição**: `mockCatalog.sessions.filter(s => s.status === 'Running').length` — consistente
+com `mapSessionStatusToTone` (Running→success). Fixture atual → 1. Rejeitada a alternativa
+"contagem total de sessões" (seria redundante com o painel de sessões ao lado).
+**Referência**: ADR-0001; handoff-002.md.
+
+---
+
+### D-006: Esquema de Cor do MetricTile
+
+**Status**: APROVADO (ADR-0003, reconfirmado 2× por script — controller no gate + handoff-agent
+lendo `concepts.module.css` diretamente nesta fase)
+**Descrição**: Numeral `var(--ink)` sobre `var(--surface-raised)` (14.09/16.96/15.78:1 nos 3
+concepts); sparkline `fill: var(--accent, var(--border))` + `fill-opacity: 0.75`
+(4.16/3.64/3.80:1). Sem tone-per-KPI (nenhum threshold de negócio em escopo). 0.75 escolhido por
+script, não por reuso do 85% do StatusChip (objetivos de transparência diferentes).
+**Referência**: ADR-0003; `memory/contrast-audit.md`.
+
+---
+
+### D-007: AC-014 "Degradação Neutra" = Accent Nativo do Concept (Opção A)
+
+**Status**: APROVADO no gate HITL do plan (trade-off resolvido, não era decisão técnica e sim de
+aparência)
+**Descrição**: Legados (command-deck, signal-poster) renderizam os tiles com o accent NATIVO
+deles (verde `#0b6b5b`, roxo `#5a31d6`) — zero código por concept, `concepts.module.css`
+zero edição. Rejeitada a leitura "cinza literal" (exigiria token `--metric-accent`
+night-harbor-only). Reversível depois de forma aditiva se o usuário preferir a outra leitura.
+**Referência**: ADR-0003 "Alternatives considered"/"Consequences"; plan.md "Proposta para
+aprovação"; state.md "Decisões do gate do plan" item 1.
+
+---
+
+### D-008: Recharts `^3.9.2`, Import Mínimo, Dimensão Fixa
+
+**Status**: APROVADO (ADR-0002)
+**Descrição**: `{ Bar, BarChart }` apenas; `width={48} height={16}` sem `ResponsiveContainer`;
+`margin` zerado; `accessibilityLayer={false}` + `aria-hidden` + `isAnimationActive={false}`.
+Provado empiricamente que jsdom renderiza sem mock algum (mesmo sem `ResizeObserver`) —
+`tests/renderer/setup.ts` fica intocado. Redux interno do Recharts 3 (~7.3MB unpacked) é custo
+aceito/divulgado (R5), não mitigado nesta feature.
+**Referência**: ADR-0002.
+
+---
+
+### D-009: Copy Final Aprovada no Gate
+
+**Status**: APROVADO
+**Descrição**: Grupo "Key metrics"; tiles "Active agents" / "Issue queue" / "Success rate" /
+"Agent time". Copy de estados (`overviewCopy.kpis`) em plan.md.
+**Referência**: state.md "Decisões do gate do plan" item 2; plan.md §"selectors.ts".
+
+---
+
 ## Rastreabilidade
 
 - **Aprovação spec**: spec.md status header (HITL 2026-07-10, sem alterações solicitadas)
-- **Origem das decisões**: grill HITL G1–G4 (state.md linhas 13–21)
+- **Aprovação plan**: plan.md status header (gate HITL 2026-07-10, trade-off AC-014 = A)
+- **Origem das decisões**: grill HITL G1–G4 (state.md linhas 13–21); gate do plan (state.md
+  "Decisões do gate do plan", 4 itens)
 - **Boundary de verificação**: constitution.md `test_expectations` + `boundaries.always` (auditoria
   numérica de contraste obrigatória para qualquer par de cor novo, sparkline inclusa)
 
-**Próxima atualização**: sdd-plan (technical design, ADRs, fechamento dos riscos R1–R5 de
-handoff-001.md).
+**Próxima atualização**: sdd-tasks (particionamento em tasks com disjoint file scopes).

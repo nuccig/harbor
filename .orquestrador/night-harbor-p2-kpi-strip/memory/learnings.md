@@ -114,11 +114,79 @@ padrão `ScenarioGroup`/`ScenarioSlice` para a KPI strip.
 
 ---
 
+## Descobertas Desta Run (handoff plan→tasks, 2026-07-10)
+
+### N4: `accessibilityLayer` do Recharts 3.x é `true` por Default
+
+**Contexto**: Probe empírico isolado durante o plan (ADR-0002).
+**Descrição**: Recharts 3.x injeta `role="application"` + `tabindex="0"` no `<svg>` renderizado
+por default — sem desligar, uma sparkline "decorativa" vira tab-stop navegável (violaria
+AC-006). `accessibilityLayer={false}` remove os dois atributos, confirmado por probe.
+
+**Implicação**: qualquer componente futuro que use Recharts (não só `MetricTile`) precisa
+lembrar de desligar essa prop explicitamente — não é opt-in por padrão sensato da lib, é
+opt-out obrigatório.
+
+**Referência**: ADR-0002; plan.md §"Recharts".
+
+---
+
+### N5: `margin` Default do Recharts Consome Metade de um Canvas de 16px
+
+**Contexto**: Mesmo probe (ADR-0002).
+**Descrição**: Com `margin` default (não-zero em todos os lados), barras de uma sparkline de
+16px de altura topavam em ~5.5px medidos; com `margin={{0,0,0,0}}`, chegavam a ~14.7px. Em
+escala de sparkline (poucos px de altura), isso não é ajuste estético — é a diferença entre
+gráfico visível e invisível.
+
+**Implicação**: qualquer chart Recharts em miniatura (não só este) precisa zerar `margin`
+explicitamente; o default da lib assume um chart de tamanho normal, não um sparkline.
+
+**Referência**: ADR-0002.
+
+---
+
+### N6: `Bar className` Aplica em Cada `<path>` Individual, Presentation Attribute Perde
+
+**Contexto**: Mesmo probe (ADR-0002/0003).
+**Descrição**: A prop `className` de `<Bar>` chega em cada `<path class="recharts-rectangle">`
+renderizado (não só no `<svg>` raiz). O atributo de apresentação `fill` que o Recharts também
+seta perde para a regra do CSS module na cascata — é assim que `var(--accent, ...)` do CSS
+module vence e resolve no contexto do concept ativo, não via prop `fill` direta.
+
+**Implicação**: para qualquer chart Recharts que precise de cor via token/tema (não hardcoded),
+o padrão é `className` + CSS module, não a prop `fill`/`stroke` direta do componente.
+
+**Referência**: ADR-0002; ADR-0003.
+
+---
+
+### N7: Componente `ui/` Pode Ser Type-Isolado dos Dados (Habilita Paralelização)
+
+**Contexto**: Leitura do `MetricTileProps` do plan durante o handoff plan→tasks.
+**Descrição**: `MetricTileProps` é `{ label: string; value: string; series: readonly number[]
+}` — tipos primitivos puros, sem import de `KpiViewModel` nem de qualquer tipo de
+`selectors.ts`/`mock-catalog.ts`. Isso não é acidental: é o mesmo padrão do `StatusChip`
+(componente `ui/` não conhece a fonte de dados, só recebe props prontas).
+
+**Implicação**: tasks de componente `ui/` e tasks de camada de dados podem, em geral, ser
+paralelizadas nesta arquitetura — o componente não precisa que o tipo de view-model exista
+primeiro para ser implementado e testado; só a task de integração (Shell) precisa dos dois
+prontos. Vale para features futuras com o mesmo padrão, não só esta.
+
+**Referência**: plan.md §"MetricTile — API"; handoff-002.md "Contexto que a próxima fase
+PRECISA".
+
+---
+
 ## Rastreabilidade
 
 - **Learnings herdados**: atlas + `.orquestrador/night-harbor-p2-statuschip-nav/memory/learnings.md`
   (L1–L11), trazidos via brain recall registrado em `memory/state.md` desta feature.
-- **N1–N3**: descobertas do handoff-agent nesta fase (spec→plan), 2026-07-10.
-- **Próxima atualização**: sdd-plan (technical design) deve adicionar learnings sobre a integração
-  Recharts+jsdom, a fórmula final de "agentes ativos", e o resultado da auditoria de contraste
-  (`contrast-audit.md` separado).
+- **N1–N3**: descobertas do handoff-agent na fase spec→plan, 2026-07-10.
+- **N4–N7**: descobertas do handoff-agent na fase plan→tasks, 2026-07-10 (N4–N6 herdadas dos
+  probes empíricos do plan-agent nos ADRs, formalizadas aqui como learnings reaproveitáveis;
+  N7 é descoberta própria desta fase de handoff).
+- **Próxima atualização**: sdd-tasks deve confirmar se o particionamento em tasks respeitou a
+  paralelização Dados×Componente (N7) e registrar qualquer learning novo sobre o processo de
+  `npm install` do Recharts dentro do scope disjunto escolhido.
