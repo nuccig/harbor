@@ -1,4 +1,5 @@
 import { useReducedMotion as useMotionReducedMotion } from 'motion/react'
+import { useExperienceState } from './ExperienceProvider'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -14,4 +15,10 @@ export function useReducedMotionPreference(): boolean {
   const motionPreference = useMotionReducedMotion()
 
   return Boolean(motionPreference || getSystemPrefersReducedMotion())
+}
+
+export function useEffectiveReducedMotion(): boolean {
+  const systemOrMotionPreference = useReducedMotionPreference()
+  const { settingsDraft } = useExperienceState()
+  return systemOrMotionPreference || settingsDraft.reduceMotion
 }

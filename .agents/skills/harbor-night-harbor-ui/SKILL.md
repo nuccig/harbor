@@ -76,7 +76,9 @@ desktop-only filters that govern all UI work. Decision source:
   over tinted fills (reinforces L-001: `on-*` presumes the solid token as background). Solid
   fallback `var(--surface-raised)` outside the `@supports` block — never color-mix in the
   fallback. Default icons by tone: CheckCircle/Clock/Warning/Minus (Phosphor Regular). Audited
-  ratios: 6.08–8.48:1 tinted, 6.88–10.49:1 fallback (ADR-0014).
+  ratios: 6.08–8.48:1 tinted, 6.88–10.49:1 fallback (ADR-0014). **Paused status (P2.4)**: reuses
+  tone `warning` with an explicit `Pause` icon override via the `icon` prop (no 5th tone; Ready
+  keeps `Clock`) — differentiation is icon+label, pair audited 8.48/10.49:1 (night-harbor).
 - **Nav ícone+label (P2)**: primary nav uses Phosphor Regular via `SemanticIcon decorative` +
   label **always visible** (truncate with ellipsis, never hide). navIcons: Compass (overview),
   FolderOpen (projects), Boat (sessions — harbor metaphor), Tray (issues), GearSix (settings).
@@ -96,22 +98,89 @@ desktop-only filters that govern all UI work. Decision source:
   concept). Audited ratios: sparkline 4.16/3.64/3.80:1 (≥3:1 non-text), numeral
   14.09/16.96/15.78:1 across the 3 concepts. Legacy concepts render their **native** accent
   (zero per-concept code) — resolved reading of "neutral degradation" (ADR-0016).
+- **`ui/` primitives are domain-blind with fully resolved props (P2.4 — standing convention)**:
+  3 data points (StatusChip → MetricTile → SessionCard) plus an explicit user override (HITL,
+  P2.4 run ADR-0004) make this a project convention, not a per-component accident. New reusable
+  primitives go in `src/renderer/src/ui/` with **zero imports of `app/`** — they define their
+  own structural prop types (TS structural typing bridges to the view model), and ALL domain
+  mapping (status→tone, action matrix, resolved aria-labels, data lookups) is resolved ONCE in
+  the selectors layer, never in the component or duplicated across call sites. An `app/` import
+  inside a `ui/` file is an automatic review finding.
+- **SessionCard (P2.4)**: session cards live in `src/renderer/src/ui/SessionCard.tsx` — the
+  whole card (meta + StatusChip + action cluster + log panel), rendered identically by the
+  Overview list and the Sessions board as `<li><SessionCard …/></li>`. Props arrive fully
+  resolved from `selectSessionViews`: `statusLabel`/`statusTone`/`paused`/`canTogglePause`/
+  `togglePauseLabel`/`logLabel`/`logLines`. `onTogglePause` is a **zero-arg** callback — the
+  call site closes over `sessionId`; the card never sees domain ids. The only internal logic is
+  presentational, driven by the `paused` flag (chip icon `Pause`, toggle icon `Play`/`Pause`) —
+  same genre as StatusChip's `defaultIconsByTone`. Card CSS in `ui/primitives.module.css`; only
+  the list layout (`.sessionList`) lives in `shell.module.css` — exact mirror of the
+  MetricTile/`.kpiStrip` split.
+- **Live session state (P2.4)**: the live slice is `pausedSessionIds: readonly string[]` on
+  `ExperienceState` (seeded `[]` — reset on reload by construction) + seed-agnostic action
+  `toggleSessionPaused` (the reducer only toggles id membership; it never imports
+  `mockCatalog`). `mockCatalog` stays a frozen seed — never mutated, never copied into state.
+  ALL surfaces (Overview sessions list, Sessions board, KPI "Active agents") read the merged
+  view through the SINGLE selector `selectSessionViews` — never the raw catalog; the
+  `isSessionActive` guard keeps spurious ids from painting Ready/Complete as Paused. Future
+  live transitions follow the same shape: sparse id set + seed-agnostic reducer + one merge
+  selector consumed by every surface.
+- **IconButton idiom (P2.4)**: icon-only actions use the existing `IconButton` primitive
+  (`variant="quiet"`) with an explicit `aria-label` (resolved by the selectors layer when it
+  carries domain copy, e.g. `Pause session {agent}: {task}`) + Phosphor icon wrapped in
+  `SemanticIcon decorative`. Max 2 actions per card, **always visible** — no hover-reveal, no
+  kebab/overflow menu.
+- **Panel disclosure (P2.4)**: expandable panel behind a trigger button: panel id via
+  `useId()`; trigger ALWAYS carries `aria-expanded={open}` + `aria-controls={panelId}` (present
+  even when closed — `aria-controls` pointing at an absent id is the accepted APG disclosure
+  pattern); panel **conditionally mounted** (not always-mounted `hidden`), placed right after
+  the action cluster in DOM order; closing must NOT move focus (the trigger stays mounted and
+  focused). Disclosure open/closed is local UI state (`useState` per instance) — never
+  `ExperienceState`. Log panel styling: `background: var(--canvas)` (terminal recess), border
+  `--border`, text `--ink`, timestamp `--ink-muted` + `.data` (mono/tabular) — audited
+  6.86–17.64:1.
+- **Effective reduced motion (P2.4)**: `useEffectiveReducedMotion()` in
+  `src/renderer/src/app/use-reduced-motion.ts` composes system preference (motion-dom) OR the
+  app setting — the single source for App and all surfaces; never re-compose it inline. `ui/`
+  components never call the hook (it's `app/`): they take a `reduceMotion` boolean prop and
+  gate the animated class conditionally (fade/rise 4px, opacity+transform only), with
+  `@media (prefers-reduced-motion: reduce)` zeroing the animation in CSS as defense in depth.
+- **No new `:hover` until P2.6**: hover ≡ rest state app-wide; interactive affordance comes
+  from the audited global focus/pressed states. Any new `:hover` pair is out of scope until the
+  dedicated P2.6 hover pass (introducing one requires a new contrast audit).
+- **sessionLogs fixture (P2.4)**: `mockCatalog.sessionLogs` is a frozen
+  `Record<sessionId, readonly SessionLogLine[]>` of deterministic lines
+  (`{ time: 'HH:MM:SS', text }`; 8/7/9 lines per seeded session). The selector resolves
+  `logLines` (`?? []`); log-panel tests derive line counts/content from the fixture, never
+  hardcode.
 
 ## Testing (renderer components)
 
 - CSS module class names are hashed at build time — assert by substring, never literal:
   `element.closest('[class*="statusChip"]')` + `expect(el?.className).toContain('statusChip_<tone>')`.
 - Counts/values asserted in tests must be derived from the fixture source
-  (`mockCatalog.agents.filter(...).length`), never hardcoded literals. (atlas learning:
+  (`mockCatalog.agents.filter(...).length`), never hardcoded literals. Same rule for DOM
+  **order/adjacency**: derive the full expected sequence from the fixture (e.g. tab stops via
+  `seedViews.flatMap(...)`), never hand-pick two items assumed adjacent — adjacency that holds
+  only by accident of today's fixture ordering fails as a fake regression on any fixture edit
+  (P2.4 finding 201). (atlas learning:
   `css-module-class-asserts-substring-and-fixture-derived`)
+- Never assert an event handler was "called with no arguments" — React always passes a
+  SyntheticEvent to `onClick={handler}`. Assert the intent instead: the received argument is
+  NOT the domain value (`expect(spy.mock.calls[0][0]).not.toBe(session.id)`). (atlas learning:
+  `react-onclick-syntheticevent-no-args-assert`)
 - Recharts `<Bar className>` lands on the `<g>` series wrapper AND on each `<path>` — counting
   bars by raw class selector over-counts by +1. Filter `tagName === 'path'` (or use
   `.recharts-rectangle`) before comparing with `series.length`.
-- Recharts 3 `<Bar>` mounts `JavascriptAnimate`, which calls
-  `window.matchMedia('(prefers-reduced-motion)').addEventListener` unconditionally — even with
-  `isAnimationActive={false}`. jsdom tests need a full `MediaQueryList` stub (`matches`,
-  `addEventListener`, `removeEventListener`, plus `addListener`/`removeListener` for lib
-  compat); the minimal `{ matches }` stub breaks the mount.
+- **No global matchMedia stub** (errata P2.4, supersedes the P2.3 rule): the mount-time
+  `matchMedia` consumer is `useReducedMotionPreference` (motion-dom) — exercised by any
+  `App`/`Shell` mount, with or without Recharts — and jsdom 29's **native** matchMedia
+  satisfies it (proven twice: 185/185 and 220/220 with `tests/renderer/setup.ts` untouched).
+  Only tests that force `matches: true` stub matchMedia **locally**, and then with the FULL
+  `MediaQueryList` surface (`matches`, `addEventListener`, `removeEventListener`, plus
+  `addListener`/`removeListener` for lib compat) — the minimal `{ matches }` stub is what
+  breaks the mount (motion-dom and Recharts' `JavascriptAnimate` both call
+  `addEventListener`).
 - Recharts clip-path ids (`recharts<N>-clip`) and React 18 `useId` output (`:r<N>:`) are
   volatile per mount — normalize them via regex to a fixed placeholder before comparing
   `innerHTML` between two renders; raw string comparison is a guaranteed false negative.
@@ -147,6 +216,13 @@ desktop-only filters that govern all UI work. Decision source:
 - **Never** mount a decorative Recharts chart with the library defaults — without
   `accessibilityLayer={false}` it becomes a keyboard tab-stop (`role="application"` +
   `tabindex="0"`), and without zeroed `margin` a sparkline-scale chart is mostly invisible.
+- **Never** import `app/` (selectors, mock-catalog, hooks, view-model types) from a `ui/`
+  primitive — props arrive fully resolved from the selectors layer; the dependency direction
+  `ui/` ⊬ `app/` is a review criterion (P2.4 convention).
+- **Never** add a `:hover` style before the P2.6 hover pass — hover ≡ rest; new hover pairs
+  require their own contrast audit.
+- **Never** mutate `mockCatalog` or copy seed fields into live state — live state is sparse
+  (ids only); the merge happens in the selector.
 
 ## References
 
@@ -159,4 +235,7 @@ desktop-only filters that govern all UI work. Decision source:
 - ADRs 0001–0016 (`docs/adr/`)
 - `.orquestrador/night-harbor-p2-kpi-strip/adr/` (run-local: 0001 KPI derivation, 0002 Recharts
   integration → docs 0015, 0003 MetricTile colors → docs 0016)
+- `.orquestrador/night-harbor-p2-inline-actions/adr/` (run-local: 0001 live session state
+  slice, 0002 Paused chip, 0003 IconButton states, 0004 SessionCard + log disclosure — 0004
+  amended with the HITL override that set the `ui/` resolved-props convention)
 - ui-ux-pro-max skill (design system search baseline)

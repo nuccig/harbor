@@ -3,7 +3,7 @@ import { MotionConfig } from 'motion/react'
 import {
   ExperienceProvider,
   useExperience,
-  useReducedMotionPreference
+  useEffectiveReducedMotion
 } from './app/index'
 import { getConceptDefinition, type SurfaceId } from './concepts'
 import { DesignLab } from './design-lab'
@@ -32,8 +32,7 @@ function getSurface(
 
 export function HarborExperience() {
   const [state, dispatch] = useExperience()
-  const systemReducedMotion = useReducedMotionPreference()
-  const reduceMotion = systemReducedMotion || state.settingsDraft.reduceMotion
+  const reduceMotion = useEffectiveReducedMotion()
   const definition = getConceptDefinition(state.concept)
   const Layout = definition.Layout
   const surface = getSurface(state.phase, state.shellDestination)

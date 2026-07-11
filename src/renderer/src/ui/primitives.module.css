@@ -332,3 +332,80 @@
   fill: var(--accent, var(--border));
   fill-opacity: 0.75; /* audited: 4.16 / 3.64 / 3.80 :1 — memory/contrast-audit.md */
 }
+
+/* ui/primitives.module.css — interior do card (SessionCard, P2.4) */
+.sessionCard {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.sessionCardRow {
+  align-items: center;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-block-size: 44px;
+}
+
+.sessionMeta {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.sessionCardControls {
+  align-items: center;
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+}
+
+.sessionLog {
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  display: grid;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+}
+
+.sessionLog > li {
+  display: flex;
+  font-size: var(--type-small);
+  gap: var(--space-3);
+}
+
+.sessionLogTime {
+  color: var(--ink-muted); /* auditado: 6.86–9.68:1 — memory/contrast-audit.md F2 */
+  flex: none;
+  /* mono/tabular via composição com a utilitária .data no TSX (mesmo module) */
+}
+
+.sessionLogText {
+  color: var(--ink); /* auditado: 12.62–17.64:1 — memory/contrast-audit.md F1 */
+  overflow-wrap: anywhere;
+}
+
+.sessionLogAnimated {
+  animation: session-log-expand var(--duration-fast) var(--ease-standard);
+}
+
+@keyframes session-log-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sessionLogAnimated {
+    animation: none; /* defesa em profundidade; o gate primário é a classe condicional */
+  }
+}

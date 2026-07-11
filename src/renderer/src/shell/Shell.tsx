@@ -14,7 +14,8 @@ import {
 import type { ShellDestination } from '../app/experience-model'
 import { mockCatalog } from '../app/mock-catalog'
 import type { ScenarioSlice, SharedAction } from '../app/mock-catalog'
-import { isSessionActive, selectShellView } from '../app/selectors'
+import { selectSessionViews, selectShellView } from '../app/selectors'
+import { useEffectiveReducedMotion } from '../app/use-reduced-motion'
 import { ScenarioPresenter } from '../scenarios'
 import { Settings } from '../settings'
 import {
@@ -22,6 +23,7 @@ import {
   FocusHeading,
   MetricTile,
   SemanticIcon,
+  SessionCard,
   SkipLink,
   SkipTarget,
   StatusChip
@@ -29,20 +31,6 @@ import {
 import styles from './shell.module.css'
 
 // Mappers — semântica de domínio vive onde é usada (decision HITL)
-
-const mapSessionStatusToTone = (status: string): 'success' | 'warning' | 'danger' | 'neutral' => {
-  if (isSessionActive(status)) {
-    return 'success'
-  }
-  switch (status) {
-    case 'Ready':
-      return 'warning'
-    case 'Complete':
-      return 'neutral'
-    default:
-      return 'neutral'
-  }
-}
 
 const mapIssuePriorityToTone = (priority: string): 'success' | 'warning' | 'danger' | 'neutral' => {
   switch (priority) {
@@ -118,6 +106,7 @@ function ScenarioGroup<T>({
 function Overview() {
   const state = useExperienceState()
   const dispatch = useExperienceDispatch()
+  const reduceMotion = useEffectiveReducedMotion()
   const { overview } = selectShellView(state)
 
   function handleAction(action: SharedAction) {
@@ -180,19 +169,22 @@ function Overview() {
         loadingAction={{ id: 'configure-agent', label: 'Configure agents' }}
         onAction={handleAction}
         renderReady={(sessions) => (
-          <ul className={styles.itemList}>
+          <ul className={styles.sessionList}>
             {sessions.map((session) => (
               <li key={session.id}>
-                <span>
-                  <strong>{session.agent}</strong>
-                  <span>{session.task}</span>
-                </span>
-                <span>
-                  <StatusChip
-                    tone={mapSessionStatusToTone(session.status)}
-                    label={session.status}
-                  />
-                </span>
+                <SessionCard
+                  agent={session.agent}
+                  canTogglePause={session.canTogglePause}
+                  logLabel={session.logLabel}
+                  logLines={session.logLines}
+                  onTogglePause={() => dispatch({ type: 'toggleSessionPaused', sessionId: session.id })}
+                  paused={session.paused}
+                  reduceMotion={reduceMotion}
+                  statusLabel={session.status}
+                  statusTone={session.statusTone}
+                  task={session.task}
+                  togglePauseLabel={session.togglePauseLabel}
+                />
               </li>
             ))}
           </ul>
@@ -290,22 +282,30 @@ function Projects() {
 }
 
 function Sessions() {
+  const state = useExperienceState()
+  const dispatch = useExperienceDispatch()
+  const reduceMotion = useEffectiveReducedMotion()
+  const sessions = selectSessionViews(state)
+
   return (
     <section className={styles.destinationPanel} data-surface="sessions">
       <h2>Agent session board</h2>
-      <ul className={styles.itemList}>
-        {mockCatalog.sessions.map((session) => (
+      <ul className={styles.sessionList}>
+        {sessions.map((session) => (
           <li key={session.id}>
-            <span>
-              <strong>{session.agent}</strong>
-              <span>{session.task}</span>
-            </span>
-            <span>
-              <StatusChip
-                tone={mapSessionStatusToTone(session.status)}
-                label={session.status}
-              />
-            </span>
+            <SessionCard
+              agent={session.agent}
+              canTogglePause={session.canTogglePause}
+              logLabel={session.logLabel}
+              logLines={session.logLines}
+              onTogglePause={() => dispatch({ type: 'toggleSessionPaused', sessionId: session.id })}
+              paused={session.paused}
+              reduceMotion={reduceMotion}
+              statusLabel={session.status}
+              statusTone={session.statusTone}
+              task={session.task}
+              togglePauseLabel={session.togglePauseLabel}
+            />
           </li>
         ))}
       </ul>
