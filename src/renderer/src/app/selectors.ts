@@ -8,6 +8,7 @@ import {
   mockCatalog,
   type MockCatalog,
   type ScenarioSlice,
+  type SessionLogLine,
   type SharedAction
 } from './mock-catalog'
 
@@ -97,8 +98,69 @@ export function resolveAgentTime(recentUsage: MockCatalog['recentUsage']): strin
   return recentUsage.find((u) => u.label === 'Agent time')?.value ?? '—'
 }
 
-function buildKpiViewModels(): readonly KpiViewModel[] {
-  const activeAgents = mockCatalog.sessions.filter((s) => isSessionActive(s.status)).length
+export type SessionRuntimeStatus = 'Running' | 'Paused' | 'Ready' | 'Complete'
+export type StatusTone = 'success' | 'warning' | 'danger' | 'neutral'
+
+// Copy EXATA dos nomes acessíveis (AC-004: ação + sessão-alvo) — exportada p/ os testes
+// derivarem nomes do fixture, nunca hardcode.
+export function sessionActionLabels(session: { agent: string; task: string }) {
+  return {
+    pause: `Pause session ${session.agent}: ${session.task}`,
+    resume: `Resume session ${session.agent}: ${session.task}`,
+    log: `Session log for ${session.agent}: ${session.task}`
+  }
+}
+
+// migrado de Shell.tsx (era mapSessionStatusToTone local), + case Paused (ADR-0002)
+function mapSessionStatusToTone(status: SessionRuntimeStatus): StatusTone {
+  if (isSessionActive(status)) return 'success'
+  switch (status) {
+    case 'Ready':
+    case 'Paused':
+      return 'warning'
+    default:
+      return 'neutral'
+  }
+}
+
+// View model TOTALMENTE resolvido — o card de ui/ não mapeia domínio nenhum.
+export interface SessionViewModel {
+  id: string
+  agent: string
+  task: string
+  status: SessionRuntimeStatus
+  statusTone: StatusTone
+  paused: boolean
+  canTogglePause: boolean
+  togglePauseLabel: string
+  logLabel: string
+  logLines: readonly SessionLogLine[]
+}
+
+// ÚNICA função de merge seed+estado vivo — as demais superfícies derivam daqui (AC-010/011).
+export function selectSessionViews(state: ExperienceState): readonly SessionViewModel[] {
+  return mockCatalog.sessions.map((session) => {
+    const status: SessionRuntimeStatus =
+      state.pausedSessionIds.includes(session.id) && isSessionActive(session.status)
+        ? 'Paused'
+        : (session.status as SessionRuntimeStatus)
+    const paused = status === 'Paused'
+    const labels = sessionActionLabels(session)
+    return {
+      ...session,
+      status,
+      statusTone: mapSessionStatusToTone(status),
+      paused,
+      canTogglePause: isSessionActive(status) || paused,
+      togglePauseLabel: paused ? labels.resume : labels.pause,
+      logLabel: labels.log,
+      logLines: mockCatalog.sessionLogs[session.id] ?? []
+    }
+  })
+}
+
+function buildKpiViewModels(sessions: readonly SessionViewModel[]): readonly KpiViewModel[] {
+  const activeAgents = sessions.filter((s) => isSessionActive(s.status)).length
   const queued = mockCatalog.issueQueue.length
   const agentTime = resolveAgentTime(mockCatalog.recentUsage)
   return [
@@ -179,7 +241,7 @@ const overviewCopy = {
 
 export interface OverviewViewModel {
   currentProject: ScenarioSlice<typeof mockCatalog.currentProject>
-  sessions: ScenarioSlice<typeof mockCatalog.sessions>
+  sessions: ScenarioSlice<readonly SessionViewModel[]>
   issueQueue: ScenarioSlice<typeof mockCatalog.issueQueue>
   recentUsage: ScenarioSlice<typeof mockCatalog.recentUsage>
   activity: ScenarioSlice<typeof mockCatalog.activity>
@@ -197,13 +259,15 @@ export function selectOverviewView(state: ExperienceState): OverviewViewModel {
         }
       : selectScenarioSlice(state, mockCatalog.currentProject, overviewCopy.currentProject)
 
+  const sessions = selectSessionViews(state)
+
   return {
     currentProject,
-    sessions: selectScenarioSlice(state, mockCatalog.sessions, overviewCopy.sessions),
+    sessions: selectScenarioSlice(state, sessions, overviewCopy.sessions),
     issueQueue: selectScenarioSlice(state, mockCatalog.issueQueue, overviewCopy.issues),
     recentUsage: selectScenarioSlice(state, mockCatalog.recentUsage, overviewCopy.usage),
     activity: selectScenarioSlice(state, mockCatalog.activity, overviewCopy.activity),
-    kpis: selectScenarioSlice(state, buildKpiViewModels(), overviewCopy.kpis)
+    kpis: selectScenarioSlice(state, buildKpiViewModels(sessions), overviewCopy.kpis)
   }
 }
 

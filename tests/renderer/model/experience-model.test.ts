@@ -73,6 +73,7 @@ describe('experience model initial session', () => {
       designLabOpen: false,
       toast: null
     })
+    expect(state.pausedSessionIds).toEqual([])
     expect(state.onboardingDraft).toEqual({
       selectedAgents: ['codex'],
       agentsSkipped: false,
@@ -315,5 +316,53 @@ describe('flow, drafts, and feedback invariants', () => {
       tone: 'success'
     })
     expect(dismissed).toEqual({ ...state, toast: null })
+  })
+})
+
+describe('live session pause state', () => {
+  it('adds a fresh session id to pausedSessionIds and changes nothing else', () => {
+    const state = createInitialExperienceState()
+    const next = experienceReducer(state, {
+      type: 'toggleSessionPaused',
+      sessionId: 'session-104'
+    })
+
+    expect(next.pausedSessionIds).toContain('session-104')
+    expect(next).toEqual({
+      ...state,
+      pausedSessionIds: [...state.pausedSessionIds, 'session-104']
+    })
+  })
+
+  it('toggling the same id twice is idempotent (round-trip)', () => {
+    const state = createInitialExperienceState()
+    const next = reduce(
+      state,
+      { type: 'toggleSessionPaused', sessionId: 'session-104' },
+      { type: 'toggleSessionPaused', sessionId: 'session-104' }
+    )
+
+    expect(next).toEqual(state)
+  })
+
+  it('toggling two different ids and then removing one preserves the other', () => {
+    const state = createInitialExperienceState()
+    const bothPaused = reduce(
+      state,
+      { type: 'toggleSessionPaused', sessionId: 'session-104' },
+      { type: 'toggleSessionPaused', sessionId: 'session-103' }
+    )
+
+    expect(bothPaused.pausedSessionIds).toEqual(
+      expect.arrayContaining(['session-104', 'session-103'])
+    )
+    expect(bothPaused.pausedSessionIds).toHaveLength(2)
+
+    const oneRemoved = experienceReducer(bothPaused, {
+      type: 'toggleSessionPaused',
+      sessionId: 'session-104'
+    })
+
+    expect(oneRemoved.pausedSessionIds).toEqual(['session-103'])
   })
 })

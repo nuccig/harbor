@@ -18,6 +18,11 @@ export interface SharedAction {
   label: string
 }
 
+export interface SessionLogLine {
+  time: string
+  text: string
+}
+
 export type ScenarioSlice<T> =
   | { status: 'ready'; data: T }
   | { status: 'loading'; label: string }
@@ -142,6 +147,38 @@ export const mockCatalog = Object.freeze({
       'success-rate': freezeArray([88, 90, 89, 91, 93, 90, 94, 92, 95, 92]),
       'agent-time': freezeArray([2.6, 2.8, 3.0, 3.1, 2.9, 3.3, 3.5, 3.4, 3.6, 3.42])
     })
+  }),
+  sessionLogs: Object.freeze<Readonly<Record<string, readonly SessionLogLine[]>>>({
+    'session-104': freezeItems([
+      { time: '09:41:02', text: 'Session started · task "Settings shell" assigned to Codex' },
+      { time: '09:41:05', text: 'Reading src/renderer/src/settings/Settings.tsx' },
+      { time: '09:41:11', text: 'Planning edit: extract settings category list' },
+      { time: '09:42:03', text: 'Applied patch to Settings.tsx (+42 −11)' },
+      { time: '09:42:27', text: 'Running lint · 0 errors' },
+      { time: '09:43:14', text: 'Running typecheck · 0 errors' },
+      { time: '09:44:39', text: 'Running test suite · 42 passed' },
+      { time: '09:45:20', text: 'Awaiting next instruction' }
+    ]),
+    'session-103': freezeItems([
+      { time: '09:12:44', text: 'Session started · task "Onboarding copy" assigned to Claude Code' },
+      { time: '09:12:50', text: 'Reading src/renderer/src/onboarding/OnboardingFlow.tsx' },
+      { time: '09:13:31', text: 'Drafting revised welcome step copy' },
+      { time: '09:15:08', text: 'Applied patch to onboarding copy strings (+9 −9)' },
+      { time: '09:15:41', text: 'Running verify gate · all checks green' },
+      { time: '09:16:22', text: 'Draft ready for operator review' },
+      { time: '09:16:23', text: 'Session idle · waiting for review' }
+    ]),
+    'session-102': freezeItems([
+      { time: '08:03:17', text: 'Session started · task "UI references" assigned to Gemini CLI' },
+      { time: '08:03:29', text: 'Collecting UI reference material' },
+      { time: '08:05:02', text: 'Summarizing 6 reference layouts' },
+      { time: '08:07:46', text: 'Writing notes to docs/ui-references.md' },
+      { time: '08:09:12', text: 'Cross-checking references against concept tokens' },
+      { time: '08:11:05', text: 'Applied patch to docs/ui-references.md (+120 −0)' },
+      { time: '08:12:33', text: 'Running verify gate · all checks green' },
+      { time: '08:13:00', text: 'Summary posted to activity feed' },
+      { time: '08:13:01', text: 'Session complete' }
+    ])
   })
 })
 

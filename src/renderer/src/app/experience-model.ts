@@ -74,6 +74,7 @@ export interface ExperienceState {
   favoriteConcept: ConceptId | null
   designLabOpen: boolean
   toast: ToastMessage | null
+  pausedSessionIds: readonly string[]
 }
 
 type UpdateOnboardingDraftAction = {
@@ -116,6 +117,7 @@ export type ExperienceAction =
   | { type: 'showToast'; toast: ToastMessage }
   | { type: 'dismissToast' }
   | { type: 'recoverScenario' }
+  | { type: 'toggleSessionPaused'; sessionId: string }
 
 function createInitialOnboardingDraft(): OnboardingDraft {
   return {
@@ -160,7 +162,8 @@ export function createInitialExperienceState(): ExperienceState {
     assessments: createEmptyAssessments(),
     favoriteConcept: null,
     designLabOpen: false,
-    toast: null
+    toast: null,
+    pausedSessionIds: []
   }
 }
 
@@ -247,5 +250,14 @@ export function experienceReducer(
       return { ...state, toast: null }
     case 'recoverScenario':
       return { ...state, scenario: 'default' }
+    case 'toggleSessionPaused': {
+      const isPaused = state.pausedSessionIds.includes(action.sessionId)
+      return {
+        ...state,
+        pausedSessionIds: isPaused
+          ? state.pausedSessionIds.filter((id) => id !== action.sessionId)
+          : [...state.pausedSessionIds, action.sessionId]
+      }
+    }
   }
 }

@@ -7,12 +7,15 @@ import {
 } from '../../../src/renderer/src/app/experience-model'
 import { mockCatalog } from '../../../src/renderer/src/app/mock-catalog'
 import {
+  isSessionActive,
   resolveAgentTime,
   selectActiveAssessment,
   selectOnboardingView,
   selectOverviewView,
+  selectSessionViews,
   selectSettingsView,
-  selectShellView
+  selectShellView,
+  sessionActionLabels
 } from '../../../src/renderer/src/app/selectors'
 
 function withScenario(state: ExperienceState, scenario: ScenarioId) {
@@ -274,5 +277,145 @@ describe('surface view models', () => {
       concept: 'night-harbor'
     })
     expect(selectActiveAssessment(state)).toEqual({ personality: 9 })
+  })
+})
+
+describe('session view models', () => {
+  it('resolves the default (no toggles) merge equivalent to the seed for every session', () => {
+    const views = selectSessionViews(createInitialExperienceState())
+
+    expect(views).toHaveLength(mockCatalog.sessions.length)
+
+    mockCatalog.sessions.forEach((session, index) => {
+      const view = views[index]
+      const labels = sessionActionLabels(session)
+      const expectedTone = isSessionActive(session.status)
+        ? 'success'
+        : session.status === 'Ready'
+          ? 'warning'
+          : 'neutral'
+
+      expect(view.id).toBe(session.id)
+      expect(view.agent).toBe(session.agent)
+      expect(view.task).toBe(session.task)
+      expect(view.status).toBe(session.status)
+      expect(view.paused).toBe(false)
+      expect(view.statusTone).toBe(expectedTone)
+      expect(view.canTogglePause).toBe(isSessionActive(session.status))
+      expect(view.togglePauseLabel).toBe(labels.pause)
+      expect(view.logLabel).toBe(labels.log)
+    })
+  })
+
+  it('pausing the seed Running session flips status, tone, and label to Paused/resume', () => {
+    const runningSession = mockCatalog.sessions.find((s) => s.status === 'Running')
+    if (!runningSession) {
+      throw new Error('expected a Running session in the fixture')
+    }
+
+    const state = experienceReducer(createInitialExperienceState(), {
+      type: 'toggleSessionPaused',
+      sessionId: runningSession.id
+    })
+    const view = selectSessionViews(state).find((v) => v.id === runningSession.id)
+    if (!view) {
+      throw new Error('expected a view model for the paused session')
+    }
+
+    expect(view.status).toBe('Paused')
+    expect(view.statusTone).toBe('warning')
+    expect(view.paused).toBe(true)
+    expect(view.canTogglePause).toBe(true)
+    expect(view.togglePauseLabel).toBe(sessionActionLabels(runningSession).resume)
+  })
+
+  it('never repaints a Ready/Complete session as Paused for a spurious toggled id', () => {
+    const nonActiveSession = mockCatalog.sessions.find(
+      (s) => s.status === 'Ready' || s.status === 'Complete'
+    )
+    if (!nonActiveSession) {
+      throw new Error('expected a Ready or Complete session in the fixture')
+    }
+
+    const state = experienceReducer(createInitialExperienceState(), {
+      type: 'toggleSessionPaused',
+      sessionId: nonActiveSession.id
+    })
+    expect(state.pausedSessionIds).toContain(nonActiveSession.id)
+
+    const view = selectSessionViews(state).find((v) => v.id === nonActiveSession.id)
+    if (!view) {
+      throw new Error('expected a view model for the toggled session')
+    }
+
+    expect(view.status).toBe(nonActiveSession.status)
+    expect(view.paused).toBe(false)
+  })
+
+  it('recomputes the active-agents KPI after a Running session is paused', () => {
+    const runningSession = mockCatalog.sessions.find((s) => s.status === 'Running')
+    if (!runningSession) {
+      throw new Error('expected a Running session in the fixture')
+    }
+    const runningCountBeforePause = mockCatalog.sessions.filter(
+      (s) => s.status === 'Running'
+    ).length
+
+    const state = experienceReducer(createInitialExperienceState(), {
+      type: 'toggleSessionPaused',
+      sessionId: runningSession.id
+    })
+    const view = selectOverviewView(state)
+    if (view.kpis.status !== 'ready') {
+      throw new Error('expected the default-scenario kpis slice to be ready')
+    }
+
+    const activeAgentsKpi = view.kpis.data.find((kpi) => kpi.id === 'active-agents')
+    expect(activeAgentsKpi?.value).toBe(String(runningCountBeforePause - 1))
+  })
+
+  it('has a log block for every seed session with 6-10 lines and unique times (G2/AC-007)', () => {
+    mockCatalog.sessions.forEach((session) => {
+      const lines = mockCatalog.sessionLogs[session.id]
+
+      expect(lines).toBeDefined()
+      expect(lines.length).toBeGreaterThanOrEqual(6)
+      expect(lines.length).toBeLessThanOrEqual(10)
+      expect(new Set(lines.map((l) => l.time)).size).toBe(lines.length)
+    })
+  })
+
+  it('keeps mockCatalog.sessions frozen and unchanged through a sequence of toggles (AC-019)', () => {
+    const seedBefore = mockCatalog.sessions.map((session) => ({ ...session }))
+
+    const runningSession = mockCatalog.sessions.find((s) => s.status === 'Running')
+    const readySession = mockCatalog.sessions.find((s) => s.status === 'Ready')
+    if (!runningSession || !readySession) {
+      throw new Error('expected Running and Ready sessions in the fixture')
+    }
+
+    let state = createInitialExperienceState()
+    state = experienceReducer(state, {
+      type: 'toggleSessionPaused',
+      sessionId: runningSession.id
+    })
+    state = experienceReducer(state, {
+      type: 'toggleSessionPaused',
+      sessionId: runningSession.id
+    })
+    state = experienceReducer(state, {
+      type: 'toggleSessionPaused',
+      sessionId: readySession.id
+    })
+
+    expect(state.pausedSessionIds).toEqual([readySession.id])
+    expect(Object.isFrozen(mockCatalog.sessions)).toBe(true)
+    expect(mockCatalog.sessions).toEqual(seedBefore)
+
+    const freshViews = selectSessionViews(createInitialExperienceState())
+    mockCatalog.sessions.forEach((session, index) => {
+      expect(freshViews[index].status).toBe(session.status)
+      expect(freshViews[index].paused).toBe(false)
+    })
   })
 })
