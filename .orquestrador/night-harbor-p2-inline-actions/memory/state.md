@@ -77,4 +77,12 @@ Notas de implement (p/ consolidate):
 - Regression observação não-bloqueante: useReducedMotionPreference chamado 3×/árvore — dedupe possível em run futura (eficiência).
 - Sem screenshot/evidência visual manual (precedente P2/P2.3 mantido; gap documentado no round summary).
 
-**Última atualização**: 2026-07-11 — controller (fix loop fechado, 1 round only; próximo: handoff →consolidate)
+| 18 Handoff →consolidate | ✓ handoff-004.md (2 learnings novos genuínos, 3 erratas, gap-analysis da skill — candidatos auditados contra o atlas real) |
+| 19 Consolidate | ✓ HITL: itens 1–7 aprovados integrais (atlas: 2 notas novas + 3 erratas + index 27→29; skill harbor-night-harbor-ui: 7 gaps + anti-patterns); ADRs 0017 (live state over frozen seed) e 0018 (ui primitives domain-blind, override→convenção) escritos em docs/adr/; template de constitution corrigido na fonte opencode (matchMedia: regra corrigida + aviso de supersessão — o vetor era reuso de constitution entre runs, não o template) + sync-harness rodado (18 skills × 2 harnesses) |
+| 19.5 Brain-sync | ✓ (dobrado no consolidate — atlas atualizado) |
+| 21 Audit | SKIP (run sem --audit) |
+| 23 PR | em andamento |
+
+Notas de processo: consolidate-agent caiu 1× por session limit (leituras iniciais); retomado via SendMessage e concluiu — 4ª/5ª ocorrências do padrão contadas e corrigidas no próprio learning (recontagem: 5 agentes, 4 runs, 2 projetos). sdd-plan/SKILL.md deliberadamente não tocado (regra matchMedia é de test_expectations, sem contraparte no plan gate).
+
+**Última atualização**: 2026-07-11 — controller (consolidação completa; abrindo PR)
