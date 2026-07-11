@@ -188,6 +188,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+.sessionList {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sessionList > li {
+  border-block-end: 1px solid var(--border);
+  padding-block: var(--space-2);
+}
+
+.sessionList > li:last-child {
+  border-block-end: 0;
+}
+
 @media (max-width: 70rem) {
   .shell {
     grid-template-columns: minmax(10rem, 0.22fr) minmax(0, 1fr);
