@@ -58,4 +58,8 @@ Issue Source Resolution: no-op (sem --issue na invocação); issue_source: nucci
 
 Nota (p/ consolidate): plan verificou empiricamente que o stub de MediaQueryList NÃO é exigido pelo Recharts hoje (185/185 verdes sem stub; gatilho real é useReducedMotionPreference/motion-dom) — nota da constitution empiricamente superada; candidata a correção de learning.
 
-**Última atualização**: 2026-07-10 — controller (plan aprovado c/ override de localização; revisão em andamento)
+| 6 Handoff plan→tasks | ✓ handoff-002.md (+2 riscos novos: boundary ui/↛app/ sem lint enforcement; regressão .itemList→.sessionList) |
+| 7 Tasks | ✓ 3 tasks sequenciais (001 dados → 002 ui/SessionCard → 003 shell); scopes disjuntos validados pelo controller; use-reduced-motion/App.tsx realocados T1→T3 (símbolo só consumido lá) |
+| 8 Analyze | ✓ PASS 20/20 ACs cobertos de fato, 0 BLOCKER; 2 WARN de rastreabilidade corrigidos pelo controller (AC-016/AC-020 no covers: da 003); INFO: useEffectiveReducedMotion sem unit isolado (precedente do repo aceita); R7 rebase-check é do controller (base recém-criada, sem drift) |
+
+**Última atualização**: 2026-07-10 — controller (analyze PASS; próximo: handoff →implement)
