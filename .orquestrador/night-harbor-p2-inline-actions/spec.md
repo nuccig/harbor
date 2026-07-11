@@ -1,6 +1,6 @@
 ---
 title: Ações inline nos cards de sessão — Night Harbor P2.4
-status: draft
+status: approved   # gate HITL 2026-07-10 — aprovada sem alterações; derivadas (a)/(b)/(c) confirmadas (KPI Active agents acompanha estado vivo)
 created: 2026-07-10
 ---
 

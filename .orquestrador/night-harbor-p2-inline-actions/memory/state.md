@@ -43,6 +43,19 @@ Issue Source Resolution: no-op (sem --issue na invocação); issue_source: nucci
 | 0.5 Brain recall | ✓ |
 | 1 Constitution | ✓ aprovada HITL (reuso P2.3 c/ ajustes) |
 | 2 Grill-me | ✓ (4 perguntas G1–G4) |
-| 3 Spec | em andamento |
+| 3 Spec | ✓ aprovada HITL (20 ACs EARS; derivadas a/b/c validadas — KPI Active agents acompanha estado vivo) |
+| 4 Handoff spec→plan | ✓ handoff-001.md (+ decisions.md D-001..D-007) |
+| 5 Plan | ✓ aprovado HITL (4 ADRs; contrast-audit 33 pares reconfirmado pelo controller por script — 0 falhas; scratchpad/contrast-recheck-p24.mjs) |
 
-**Última atualização**: 2026-07-10 — controller (grill fechado)
+## Decisões do gate do plan (vinculantes)
+
+1. Estado vivo: set esparso `pausedSessionIds` + action `toggleSessionPaused` + selector único `selectSessionViews` consumido pelas 3 superfícies (Overview, board Sessions, KPI Active agents). Sparkline permanece estática.
+2. Paused = tone `warning` reusado + ícone Phosphor `Pause` — 0 hex novos; pares re-medidos (8.48/10.49 nh; 6.73–10.02 legados).
+3. **OVERRIDE do usuário**: SessionCard em `ui/` com props totalmente resolvidas (não shell/); mapping de domínio centralizado no selector p/ não duplicar nos call sites. Revisão concluída: plan.md uniformizado, ADR-0004 amended, ADR-0001 consequência atualizada, D-008..D-012 promovidos. Nota de processo: plan-agent caiu 1× por session limit no meio da revisão; retomado via SendMessage (protocolo contract.md, 3ª ocorrência do padrão — plan P2.3, consolidate P2.3) e concluiu.
+4. Sem `:hover` novo (hover ≡ repouso; hover app-wide fica p/ P2.6).
+5. Painel de log: fundo `--canvas`, fade/rise 4px gated por `useEffectiveReducedMotion`; texto `--ink`, timestamp `--ink-muted` (6.86–17.64:1).
+6. Copy: "Pause/Resume session {agent}: {task}", "Session log for {agent}: {task}", timestamp HH:MM:SS, 8/7/9 linhas fake.
+
+Nota (p/ consolidate): plan verificou empiricamente que o stub de MediaQueryList NÃO é exigido pelo Recharts hoje (185/185 verdes sem stub; gatilho real é useReducedMotionPreference/motion-dom) — nota da constitution empiricamente superada; candidata a correção de learning.
+
+**Última atualização**: 2026-07-10 — controller (plan aprovado c/ override de localização; revisão em andamento)
