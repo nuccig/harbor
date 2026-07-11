@@ -2,7 +2,9 @@
 
 ## Status Atual
 
-**Fase**: `grill-me` (próxima)
+**Fase**: `done` (run encerrada)
+**Saída**: PR #7 (ready) `feat/night-harbor-p2-inline-actions` → `feat/night-harbor-p2-kpi-strip` (stacked sobre PR #6; cadeia #2 ← #4 ← #5 ← #6 ← #7)
+**Próximo lote**: P2.5 (filter chips no Activity) — depois P2.6 da proposta
 **Branch**: feat/night-harbor-p2-inline-actions (stacked sobre feat/night-harbor-p2-kpi-strip / PR #6; cadeia #2 ← #4 ← #5 ← #6 ← #7)
 **Modo**: pipeline normal (sem --audit)
 **Origem**: proposta-melhorias-001.md §4 — P2.4 (ações inline nos cards de sessão: pausar/retomar/abrir log, mock — sem backend)
@@ -81,7 +83,7 @@ Notas de implement (p/ consolidate):
 | 19 Consolidate | ✓ HITL: itens 1–7 aprovados integrais (atlas: 2 notas novas + 3 erratas + index 27→29; skill harbor-night-harbor-ui: 7 gaps + anti-patterns); ADRs 0017 (live state over frozen seed) e 0018 (ui primitives domain-blind, override→convenção) escritos em docs/adr/; template de constitution corrigido na fonte opencode (matchMedia: regra corrigida + aviso de supersessão — o vetor era reuso de constitution entre runs, não o template) + sync-harness rodado (18 skills × 2 harnesses) |
 | 19.5 Brain-sync | ✓ (dobrado no consolidate — atlas atualizado) |
 | 21 Audit | SKIP (run sem --audit) |
-| 23 PR | em andamento |
+| 23 PR | ✓ PR #7 ready (draft → sem CI no repo, precedente PR #6 → flip com gate local verde 220/220). Hook [done] n/a (run sem --issue) |
 
 Notas de processo: consolidate-agent caiu 1× por session limit (leituras iniciais); retomado via SendMessage e concluiu — 4ª/5ª ocorrências do padrão contadas e corrigidas no próprio learning (recontagem: 5 agentes, 4 runs, 2 projetos). sdd-plan/SKILL.md deliberadamente não tocado (regra matchMedia é de test_expectations, sem contraparte no plan gate).
 
