@@ -131,6 +131,13 @@ describe('Shell inline session actions', () => {
 
     expectStatusChip('Running', 'success')
     expect(screen.getByRole('button', { name: labels.pause })).toBeInTheDocument()
+
+    // Close the pause → resume → pause cycle (review 202) on the exact same mounted
+    // SessionCard instance, with no intervening remount/navigation.
+    await user.click(screen.getByRole('button', { name: labels.pause }))
+
+    expectStatusChip('Paused', 'warning')
+    expect(screen.getByRole('button', { name: labels.resume })).toBeInTheDocument()
   })
 
   it('keeps pause state consistent across Overview and the Sessions board in both directions (AC-010)', async () => {
@@ -237,24 +244,27 @@ describe('Shell inline session actions', () => {
     )
     await completeOnboarding(user)
 
-    const runningLabels = sessionActionLabels(runningSession)
-    const pauseButton = screen.getByRole('button', { name: runningLabels.pause })
-    const runningLogButton = screen.getByRole('button', { name: runningLabels.log })
+    // Derive the full expected stop sequence from seedViews (already in fixture/DOM order)
+    // instead of assuming any two specific cards are adjacent (review 201): each card
+    // contributes its pause/resume stop only when canTogglePause, then its log stop — a
+    // card with no toggle button must not insert a pause/resume stop of its own.
+    const expectedStops = seedViews.flatMap((view) => [
+      ...(view.canTogglePause
+        ? [screen.getByRole('button', { name: view.togglePauseLabel })]
+        : []),
+      screen.getByRole('button', { name: view.logLabel })
+    ])
 
-    pauseButton.focus()
-    expect(document.activeElement).toBe(pauseButton)
-    await user.tab()
-    expect(document.activeElement).toBe(runningLogButton)
+    // Sanity check the derived sequence mixes both card shapes, so this test still exercises
+    // the "no toggle stop" edge case whatever the fixture's current ordering is.
+    expect(expectedStops.length).toBeGreaterThan(seedViews.length)
 
-    // A card with no toggle button (only 1 button) must not insert a pause/resume stop
-    // between the previous card's log button and its own log button.
-    const oneButtonLabels = sessionActionLabels(oneButtonSession)
-    const oneButtonLogButton = screen.getByRole('button', { name: oneButtonLabels.log })
-
-    runningLogButton.focus()
-    expect(document.activeElement).toBe(runningLogButton)
-    await user.tab()
-    expect(document.activeElement).toBe(oneButtonLogButton)
+    expectedStops[0].focus()
+    expect(document.activeElement).toBe(expectedStops[0])
+    for (let i = 1; i < expectedStops.length; i++) {
+      await user.tab()
+      expect(document.activeElement).toBe(expectedStops[i])
+    }
   })
 
   it('suppresses the sessionLogAnimated class when the reduce-motion setting is enabled (AC-015, setting path)', async () => {

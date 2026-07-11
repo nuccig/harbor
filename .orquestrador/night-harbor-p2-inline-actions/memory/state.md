@@ -62,4 +62,19 @@ Nota (p/ consolidate): plan verificou empiricamente que o stub de MediaQueryList
 | 7 Tasks | ✓ 3 tasks sequenciais (001 dados → 002 ui/SessionCard → 003 shell); scopes disjuntos validados pelo controller; use-reduced-motion/App.tsx realocados T1→T3 (símbolo só consumido lá) |
 | 8 Analyze | ✓ PASS 20/20 ACs cobertos de fato, 0 BLOCKER; 2 WARN de rastreabilidade corrigidos pelo controller (AC-016/AC-020 no covers: da 003); INFO: useEffectiveReducedMotion sem unit isolado (precedente do repo aceita); R7 rebase-check é do controller (base recém-criada, sem drift) |
 
-**Última atualização**: 2026-07-10 — controller (analyze PASS; próximo: handoff →implement)
+| 9 Handoff →implement | ✓ handoff-003.md |
+| 10 Implement | ✓ sequencial 001 (eab19d0, 194/194) → 002 (4a4361d, 209/209) → 003 (d24f5da, 220/220); scopes validados pelo controller a cada task |
+| 12 Verify | ✓ controller: lint 0, tsc 0, 220/220; openwiki n/a |
+| 13 Review | ✓ round 001, 5 dimensões paralelas: 0 Critical/High, 1 Medium (201 adjacência não derivada no AC-014), 1 Low (202 sem ciclo 3-cliques); requirements 20/20 PASS, architecture/regression/security limpas |
+| 14–15 Fix | ✓ 2/2 resolvidos (só inline-actions.test.tsx; issue files resolved). Handoff review→fix inline (issue files self-contained por design do sdd-review) |
+| 16 Verify | ✓ controller: lint 0, tsc 0, 220/220 |
+| 17 Re-review | **SKIP por decisão HITL do usuário (2026-07-11): apenas 1 round de review nesta run**; validação pós-fix feita pelo controller (escopo + gate + issue files conferidos) |
+
+Notas de implement (p/ consolidate):
+- Barrel bare `.../src/renderer/src/app` colide com `App.tsx` em filesystem case-insensitive (TS1149, Windows) — testes importam submodules explícitos (candidato a learning atlas).
+- Assert "called with no arguments" incompatível com `onClick={handler}` (React passa SyntheticEvent) — assert reformulado preservando intenção (nenhum sessionId vazando).
+- Task 001: implement-agent rodou 1× `git diff --stat` read-only (violação de letra da regra no-git; sem efeito; confessado no Report).
+- Regression observação não-bloqueante: useReducedMotionPreference chamado 3×/árvore — dedupe possível em run futura (eficiência).
+- Sem screenshot/evidência visual manual (precedente P2/P2.3 mantido; gap documentado no round summary).
+
+**Última atualização**: 2026-07-11 — controller (fix loop fechado, 1 round only; próximo: handoff →consolidate)
